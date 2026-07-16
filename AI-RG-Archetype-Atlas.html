@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Risk &amp; Governance — Archetype Atlas</title>
+<style>
+:root{
+  --sc-blue:#0072CE;
+  --sc-blue-dark:#00427A;
+  --sc-blue-deeper:#002B52;
+  --sc-blue-tint:#E9F3FC;
+  --sc-green:#38D200;
+  --sc-green-dark:#2E9E0E;
+  --sc-green-tint:#EDFAE5;
+  --ink:#1D2530;
+  --slate:#5B6770;
+  --mist:#8C99A6;
+  --line:#E1E8EF;
+  --panel:#F6F9FC;
+  --white:#FFFFFF;
+  --high:#C8102E;
+  --high-tint:#FBEBEE;
+  --med:#E8A200;
+  --med-tint:#FCF4E0;
+  --low:#2E9E0E;
+  --low-tint:#EDFAE5;
+  --shadow:0 1px 2px rgba(29,37,48,.05),0 6px 18px rgba(29,37,48,.06);
+  --shadow-lift:0 2px 4px rgba(0,66,122,.08),0 14px 34px rgba(0,66,122,.14);
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  color:var(--ink);
+  background:var(--white);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+button{font-family:inherit}
+
+/* ---------- Cover ---------- */
+#cover{
+  position:fixed;inset:0;z-index:100;
+  background:linear-gradient(135deg,#0B63B4 0%,#0072CE 38%,#00427A 100%);
+  color:#fff;display:flex;flex-direction:column;justify-content:center;
+  padding:8vh 9vw;transition:opacity .7s ease,visibility .7s;
+}
+#cover.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#cover .eyebrow{font-size:14px;letter-spacing:.22em;text-transform:uppercase;opacity:.85;margin-bottom:26px}
+#cover h1{font-size:clamp(38px,5.2vw,64px);font-weight:bold;line-height:1.12;max-width:16ch}
+#cover h2{font-size:clamp(20px,2.4vw,30px);font-weight:normal;line-height:1.3;margin-top:14px;opacity:.92;max-width:34ch}
+#cover .cover-meta{margin-top:44px;display:flex;gap:34px;flex-wrap:wrap}
+#cover .cover-meta div{border-left:3px solid rgba(255,255,255,.55);padding-left:14px}
+#cover .cover-meta b{display:block;font-size:22px}
+#cover .cover-meta span{font-size:12.5px;opacity:.8;text-transform:uppercase;letter-spacing:.08em}
+#enterBtn{
+  margin-top:56px;align-self:flex-start;background:#fff;color:var(--sc-blue-dark);
+  border:none;font-size:16px;font-weight:bold;padding:15px 34px;border-radius:999px;
+  cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform .2s,box-shadow .2s;
+}
+#enterBtn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+#enterBtn .arr{transition:transform .2s}
+#enterBtn:hover .arr{transform:translateX(4px)}
+.cover-grid{
+  position:absolute;right:-4vw;top:50%;transform:translateY(-50%);
+  width:38vw;max-width:560px;aspect-ratio:1;opacity:.16;pointer-events:none;
+}
+
+/* ---------- App chrome ---------- */
+#topbar{
+  position:sticky;top:0;z-index:50;background:var(--white);
+  border-bottom:1px solid var(--line);
+}
+#topbar .bar-inner{
+  max-width:1240px;margin:0 auto;padding:0 28px;height:62px;
+  display:flex;align-items:center;gap:26px;
+}
+.brandmark{display:flex;flex-direction:column;line-height:1.15;cursor:pointer}
+.brandmark b{font-size:15px;color:var(--sc-blue-dark)}
+.brandmark span{font-size:11px;color:var(--mist);letter-spacing:.14em;text-transform:uppercase}
+nav.tabs{display:flex;gap:4px;margin-left:auto}
+nav.tabs button{
+  background:none;border:none;font-size:14px;color:var(--slate);padding:10px 14px;
+  cursor:pointer;border-radius:8px;position:relative;font-weight:bold;
+}
+nav.tabs button:hover{background:var(--panel);color:var(--sc-blue-dark)}
+nav.tabs button.active{color:var(--sc-blue)}
+nav.tabs button.active::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:3px;
+  background:linear-gradient(90deg,var(--sc-blue),var(--sc-green));border-radius:2px;
+}
+#crumbs{
+  max-width:1240px;margin:0 auto;padding:16px 28px 0;font-size:13px;color:var(--mist);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+#crumbs a{color:var(--sc-blue);text-decoration:none;cursor:pointer}
+#crumbs a:hover{text-decoration:underline}
+#crumbs .sep{color:var(--line)}
+main{max-width:1240px;margin:0 auto;padding:22px 28px 90px}
+
+.view{animation:fadeUp .45s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .view,#enterBtn,.card,.uc-card{animation:none!important;transition:none!important}
+}
+
+/* ---------- Typography blocks ---------- */
+.page-head{margin:26px 0 8px}
+.page-head .kicker{font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--sc-blue);font-weight:bold}
+.page-head h1{font-size:clamp(28px,3.4vw,40px);font-weight:bold;line-height:1.15;margin-top:8px}
+.page-head p.lede{font-size:16.5px;color:var(--slate);max-width:76ch;margin-top:12px}
+.section-title{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);font-weight:bold;margin:42px 0 16px;display:flex;align-items:center;gap:14px}
+.section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ---------- Stat strip ---------- */
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:30px 0 8px}
+.stat{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift);border-color:var(--sc-blue)}
+.stat b{font-size:30px;color:var(--sc-blue-dark);display:block;line-height:1.1}
+.stat span{font-size:12px;color:var(--slate);text-transform:uppercase;letter-spacing:.08em}
+.stat.tier-high b{color:var(--high)} .stat.tier-med b{color:var(--med)} .stat.tier-low b{color:var(--low)}
+
+/* ---------- Cards ---------- */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px}
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px;cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s;
+  display:flex;flex-direction:column;gap:10px;min-height:186px;
+}
+.card::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--sc-blue),var(--sc-green));
+  transform:scaleY(0);transform-origin:top;transition:transform .25s ease;
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);border-color:#BBD6F0}
+.card:hover::before{transform:scaleY(1)}
+.card .glyph{
+  width:42px;height:42px;border-radius:11px;background:var(--sc-blue-tint);
+  color:var(--sc-blue-dark);display:flex;align-items:center;justify-content:center;
+  font-weight:bold;font-size:15px;letter-spacing:.02em;
+}
+.card h3{font-size:17px;font-weight:bold;line-height:1.28}
+.card p{font-size:13.5px;color:var(--slate);flex:1}
+.card .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
+.card .count{font-size:12px;color:var(--mist)}
+.card .go{font-size:13px;color:var(--sc-blue);font-weight:bold;opacity:0;transform:translateX(-4px);transition:.2s}
+.card:hover .go{opacity:1;transform:none}
+
+/* domain cards */
+.domain-card .glyph{background:var(--sc-blue-dark);color:#fff}
+.domain-card{min-height:200px}
+
+/* ---------- chips & badges ---------- */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:bold;
+  padding:4px 11px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
+.chip.high{background:var(--high-tint);color:var(--high)}
+.chip.med{background:var(--med-tint);color:#9A6E00}
+.chip.low{background:var(--low-tint);color:var(--low)}
+.chip.neutral{background:var(--panel);color:var(--slate);text-transform:none;letter-spacing:0;font-weight:normal;font-size:12px}
+.chip.pattern{background:var(--sc-blue-tint);color:var(--sc-blue-dark);text-transform:none;letter-spacing:0}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px}
+
+/* ---------- Archetype detail ---------- */
+.split{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:26px;align-items:start}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.panel h4{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--mist);margin-bottom:14px}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:none}
+.kv b{color:var(--ink)} .kv span{color:var(--slate);text-align:right}
+
+.uc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.uc-card{
+  border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:#fff;
+  cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;
+  display:flex;flex-direction:column;gap:9px;
+}
+.uc-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);border-color:#BBD6F0}
+.uc-card h4{font-size:15.5px;line-height:1.3}
+.uc-card p{font-size:13px;color:var(--slate);flex:1}
+.uc-card .tiers{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--mist)}
+.uc-card .arrow-flow{font-size:13px;color:var(--mist)}
+
+/* ---------- dimension bars ---------- */
+.dims{display:flex;flex-direction:column;gap:13px}
+.dim{display:grid;grid-template-columns:170px 1fr 34px;gap:12px;align-items:center;font-size:13px}
+.dim label{color:var(--slate)}
+.dim .track{height:9px;border-radius:6px;background:#E9EEF4;overflow:hidden}
+.dim .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--sc-blue),var(--sc-green));
+  width:0;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+.dim .fill.hot{background:linear-gradient(90deg,#E8A200,var(--high))}
+.dim b{text-align:right;color:var(--sc-blue-dark)}
+
+/* ---------- risk spectrum (signature) ---------- */
+.spectrum{margin:18px 0 6px}
+.spectrum .lane{
+  position:relative;height:14px;border-radius:8px;
+  background:linear-gradient(90deg,#59B94C 0%,#A9CE3B 30%,#F2C14E 55%,#E8862B 78%,#C8102E 100%);
+}
+.spectrum .marker{
+  position:absolute;top:50%;width:26px;height:26px;border-radius:50%;
+  border:4px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.28);
+  transform:translate(-50%,-50%);transition:left 1.1s cubic-bezier(.3,.8,.25,1);
+}
+.spectrum .marker.inh{background:var(--sc-blue-dark)}
+.spectrum .marker.res{background:var(--sc-green-dark)}
+.spectrum .legend{display:flex;justify-content:space-between;font-size:11px;color:var(--mist);
+  text-transform:uppercase;letter-spacing:.1em;margin-top:9px}
+.spectrum-note{display:flex;gap:22px;font-size:12.5px;color:var(--slate);margin-top:12px}
+.spectrum-note i{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:-1px}
+
+/* ---------- tabs ---------- */
+.tabbar{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:30px 0 22px;flex-wrap:wrap}
+.tabbar button{
+  background:none;border:none;font-size:14px;font-weight:bold;color:var(--slate);
+  padding:11px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;
+}
+.tabbar button.active{color:var(--sc-blue);border-bottom-color:var(--sc-blue)}
+.tabbar button:hover{color:var(--sc-blue-dark)}
+
+/* ---------- lists ---------- */
+.check-list{display:flex;flex-direction:column;gap:11px}
+.check-list li{
+  list-style:none;display:flex;gap:13px;font-size:14px;background:#fff;
+  border:1px solid var(--line);border-radius:11px;padding:13px 16px;align-items:flex-start;
+}
+.check-list li .tick{
+  flex:none;width:22px;height:22px;border-radius:50%;background:var(--sc-green-tint);
+  color:var(--sc-green-dark);display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:bold;margin-top:1px;
+}
+.check-list li.warn .tick{background:var(--med-tint);color:#9A6E00}
+.check-list li.stop .tick{background:var(--high-tint);color:var(--high)}
+
+/* jurisdiction grid */
+.jx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
+.jx{border:1px solid var(--line);border-radius:11px;padding:15px 17px;background:#fff}
+.jx b{font-size:14px;display:flex;align-items:center;gap:9px}
+.jx p{font-size:12.5px;color:var(--slate);margin-top:6px}
+.jx .flagbox{width:26px;height:18px;border-radius:3px;background:var(--sc-blue-tint);
+  color:var(--sc-blue-dark);font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center}
+
+/* roadmap */
+.gates{position:relative;margin:10px 0 0;padding-left:30px}
+.gates::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.gate{position:relative;padding:0 0 26px 8px}
+.gate:last-child{padding-bottom:0}
+.gate::before{
+  content:"";position:absolute;left:-27px;top:4px;width:16px;height:16px;border-radius:50%;
+  background:#fff;border:4px solid var(--sc-blue);
+}
+.gate.done::before{background:var(--sc-green);border-color:var(--sc-green)}
+.gate b{font-size:14.5px;display:block}
+.gate span{font-size:13px;color:var(--slate)}
+.gate .gtag{font-size:10.5px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-blue)}
+
+/* ---------- rules ---------- */
+.rule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.rule{border:1px solid var(--line);border-left:5px solid var(--sc-blue);border-radius:12px;padding:19px;background:#fff}
+.rule.floor{border-left-color:var(--high)}
+.rule.credit{border-left-color:var(--sc-green)}
+.rule b{font-size:15px;display:block;margin-bottom:6px}
+.rule p{font-size:13px;color:var(--slate)}
+.rule .rid{font-size:10.5px;font-weight:bold;letter-spacing:.14em;color:var(--mist);text-transform:uppercase}
+
+/* ---------- simulator ---------- */
+.sim-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}
+@media(max-width:940px){.sim-wrap{grid-template-columns:1fr}}
+.sim-controls{display:flex;flex-direction:column;gap:20px}
+.ctl{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px 19px}
+.ctl label{font-size:13px;font-weight:bold;display:flex;justify-content:space-between;margin-bottom:11px}
+.ctl label output{color:var(--sc-blue)}
+.seg{display:flex;flex-wrap:wrap;gap:7px}
+.seg button{
+  border:1px solid var(--line);background:#fff;border-radius:999px;font-size:12.5px;
+  padding:7px 14px;cursor:pointer;color:var(--slate);transition:.15s;
+}
+.seg button:hover{border-color:var(--sc-blue)}
+.seg button.on{background:var(--sc-blue);border-color:var(--sc-blue);color:#fff;font-weight:bold}
+input[type=range]{width:100%;accent-color:var(--sc-blue)}
+.verdict{
+  border:1px solid var(--line);border-radius:var(--radius);padding:26px;background:var(--panel);
+  position:sticky;top:86px;
+}
+.verdict .big-tier{
+  font-size:44px;font-weight:bold;letter-spacing:.01em;line-height:1;
+  display:flex;align-items:center;gap:14px;margin:8px 0 4px;
+}
+.verdict .big-tier .pulse{width:18px;height:18px;border-radius:50%;position:relative}
+.verdict .big-tier .pulse::after{
+  content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid currentColor;
+  opacity:.5;animation:pulse 1.8s ease-out infinite;
+}
+@keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+.fired{margin-top:18px;display:flex;flex-direction:column;gap:9px}
+.fired li{list-style:none;font-size:13px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:10px 13px;display:flex;gap:10px;animation:fadeUp .35s both}
+.fired li b{color:var(--sc-blue-dark)}
+.score-readout{display:flex;gap:22px;margin-top:16px}
+.score-readout div b{font-size:24px;display:block;color:var(--sc-blue-dark)}
+.score-readout div span{font-size:11px;color:var(--mist);text-transform:uppercase;letter-spacing:.08em}
+
+/* footer strip */
+.footnote{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--mist);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+
+/* back button */
+.backlink{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sc-blue);
+  font-weight:bold;cursor:pointer;background:none;border:none;padding:6px 0;margin-top:10px}
+.backlink:hover{text-decoration:underline}
+
+::selection{background:var(--sc-blue-tint)}
+</style>
+</head>
+<body>
+
+<div id="cover">
+  <svg class="cover-grid" viewBox="0 0 100 100" aria-hidden="true">
+    <g fill="none" stroke="#fff" stroke-width=".5">
+      <circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="22"/>
+      <path d="M4 50 H96 M50 4 V96 M17 17 L83 83 M83 17 L17 83"/>
+    </g>
+  </svg>
+  <div class="eyebrow">AI Risk &amp; Governance · Second Line of Defence</div>
+  <h1>AI Use-Case Archetype Atlas</h1>
+  <h2>An interactive risk map of AI and agentic AI across the Group — from intake to deployment nod</h2>
+  <div class="cover-meta">
+    <div><b id="cvDomains">4</b><span>Business domains</span></div>
+    <div><b id="cvArch">12</b><span>Archetypes</span></div>
+    <div><b id="cvUC">36</b><span>Use cases mapped</span></div>
+    <div><b id="cvRules">12</b><span>Static tiering rules</span></div>
+  </div>
+  <button id="enterBtn">Enter the atlas <span class="arr">→</span></button>
+</div>
+
+<div id="topbar">
+  <div class="bar-inner">
+    <div class="brandmark" onclick="go('home')">
+      <b>AI Risk &amp; Governance</b>
+      <span>Archetype Atlas</span>
+    </div>
+    <nav class="tabs" id="mainTabs">
+      <button data-v="home">Portfolio</button>
+      <button data-v="domains">Domains</button>
+      <button data-v="rules">Tiering rules</button>
+      <button data-v="sim">Simulator</button>
+    </nav>
+  </div>
+</div>
+<div id="crumbs"></div>
+<main id="app"></main>
+<script>
+/* ============================================================
+   DATA MODEL — AI Risk & Governance Archetype Atlas
+   Tiers: High / Medium / Low. Dimensions scored 1–5.
+   Dimensions: autonomy, data, impact, regulatory, opacity, reversibility
+   ============================================================ */
+
+const RULES = [
+ {id:"R1", kind:"floor", name:"Agentic floor", text:"No agentic use case is ever tiered Low. Any system that plans, selects tools or acts across steps carries a Medium floor regardless of scope."},
+ {id:"R2", kind:"floor", name:"Autonomy escalation", text:"Autonomy L3+ (acts first, reports later, or fully autonomous) is automatically High. No control package de-escalates below High while L3+ autonomy remains."},
+ {id:"R3", kind:"floor", name:"Irreversibility floor", text:"Write access to irreversible or hard-to-unwind tools — payments, ledger postings, client communications at scale, production config — sets a High floor."},
+ {id:"R4", kind:"floor", name:"Customer decisioning", text:"AI that materially influences credit, pricing, eligibility or claims outcomes for clients is High, whether retail or wholesale."},
+ {id:"R5", kind:"floor", name:"Client-facing generation", text:"Generative output reaching clients without pre-release human review is at minimum Medium; unreviewed advice-like output escalates to High."},
+ {id:"R6", kind:"escalate", name:"Sovereignty trigger", text:"In-scope data from localisation markets (CN, IN, KR, ID, VN) processed or stored outside the jurisdiction escalates the tier one band."},
+ {id:"R7", kind:"escalate", name:"Regulated-process trigger", text:"Use inside AML/sanctions, credit, capital, or regulatory reporting processes is at minimum Medium; decisioning inside these processes is High."},
+ {id:"R8", kind:"escalate", name:"Third-party opacity", text:"Vendor-embedded AI without model transparency, evaluation access, or a contractual Responsible AI clause escalates one band."},
+ {id:"R9", kind:"escalate", name:"PII at scale", text:"Processing special-category data or personal data above ~100k records sets a Medium minimum and triggers mandatory DPIA/DRA."},
+ {id:"R10", kind:"credit", name:"Human-in-the-loop credit", text:"Verified maker–checker with binding human sign-off before effect may reduce the residual tier by one band — never below any active floor."},
+ {id:"R11", kind:"credit", name:"Containment credit", text:"Read-only tool scope, sandboxed execution, rollback and a tested kill-switch may reduce residual by one band — never below any active floor."},
+ {id:"R12", kind:"credit", name:"Low-eligibility gate", text:"Only internal-only, non-decisioning use on public/internal data at autonomy L0–L1 with no regulated-process contact is eligible for Low."}
+];
+
+const DIM_LABELS = {
+ autonomy:"Autonomy & agency", data:"Data sensitivity", impact:"Decision impact",
+ regulatory:"Regulatory exposure", opacity:"Model opacity", reversibility:"Irreversibility"
+};
+
+const DOMAINS = [
+ {id:"wrb", code:"WRB", name:"Wealth & Retail Banking",
+  desc:"Client-facing retail and wealth propositions — deposits, lending, cards, investments and advisory. AI here touches real clients, real money and conduct obligations, so customer-decisioning and client-facing generation rules dominate.",
+  colorNote:"Highest concentration of R4/R5 floors in the portfolio."},
+ {id:"cib", code:"CIB", name:"Corporate & Institutional Banking",
+  desc:"Transaction banking, financial markets, lending and capital solutions for corporates and institutions. AI concentrates in document-heavy operations, markets analytics and wholesale credit — cross-border by default, so the jurisdiction matrix works hardest here.",
+  colorNote:"Sovereignty (R6) and regulated-process (R7) triggers fire most often."},
+ {id:"fn", code:"FN", name:"Functions",
+  desc:"HR, Finance, Legal, Compliance, Risk, Operations and Technology. The engine room — the largest volume of use cases, from engineering copilots to financial-crime models to agentic process automation on ServiceNow and SAP.",
+  colorNote:"Widest tier spread: from Low productivity tools to High financial-crime decisioning."},
+ {id:"ven", code:"SCV", name:"SC Ventures & Brands",
+  desc:"Mox, Trust, nexus, Solv and the venture portfolio. Digital-first entities that move fast on cloud-native AI — governance travels with the brand, so the same floors apply with brand-specific regulator overlays (HKMA for Mox, MAS for Trust).",
+  colorNote:"Speed-to-market pressure makes gate discipline the control that matters most."}
+];
+
+/* ---------- Archetypes & use cases ---------- */
+const ARCHETYPES = [
+
+{id:"a1", glyph:"CA", name:"Conversational client assistants", domains:["wrb","ven"],
+ patterns:["Chatbot","Voice bot","RAG assistant"],
+ platforms:["Azure OpenAI","AWS Bedrock","Contact-centre SaaS"],
+ inherent:"High",
+ blurb:"Chat and voice AI that speaks directly to clients — service queries, product Q&A, guided journeys.",
+ detail:"Anything generative that reaches a client mouthpiece-first sits under the client-facing generation floor (R5). The archetype splits on whether output is advice-like: servicing bots with grounded, reviewed content can land Medium residual; anything that strays toward suitability or recommendations holds High.",
+ useCases:[
+  {id:"a1u1", name:"Retail servicing chatbot (Mox / Trust)", div:"SC Ventures & Brands", pattern:"RAG chatbot", platform:"AWS Bedrock + brand stack", agentic:false, autonomy:"L1",
+   desc:"Grounded RAG assistant answering account, card and payments servicing queries inside the brand apps, with hand-off to human agents.",
+   dims:{autonomy:2,data:4,impact:3,regulatory:4,opacity:3,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R5","R9","R10","R11"],
+   jurisdictions:[
+    {c:"HK",note:"HKMA GenAI consumer guidance — disclosure, fallback to human, complaint routing (Mox)."},
+    {c:"SG",note:"MAS FEAT self-assessment; PDPA consent and purpose limitation (Trust)."},
+    {c:"UK",note:"Consumer Duty read-across for fair outcomes in servicing journeys."}],
+   controls:["Retrieval restricted to approved product & servicing corpus, versioned and signed off by the business","Advice-boundary classifier blocks suitability, investment and complaints-handling intents to human agents","Full conversation logging with PII redaction into the forensic store","Weekly grounded-accuracy and toxicity evaluation against a frozen golden set","Client disclosure that they are speaking with an AI assistant, with one-tap human hand-off"],
+   mitigations:["Pilot to staff-assisted mode first: agent sees draft, client sees agent","Ring-fence brand data in-region; no cross-border training on conversation logs","Quarterly conduct-risk sampling of transcripts by 2LoD"],
+   gates:[
+    {t:"Intake & inventory registration",d:"Use case registered against brand entity; deduplicated against Group chatbot estate.",tag:"Gate 1",done:true},
+    {t:"Tiering, DRA & jurisdiction mapping",d:"Six-dimension scoring; HKMA/MAS overlays confirmed; DPIA completed.",tag:"Gate 2",done:true},
+    {t:"Controls evidence & UAT",d:"Advice-boundary red-teaming, grounding evaluation, hand-off drills.",tag:"Gate 3",done:true},
+    {t:"Conditional nod & hypercare",d:"Deploy with 90-day hypercare, drift alarms, monthly transcript sampling.",tag:"Gate 4",done:false}],
+   verdict:"Conditional nod — Medium residual, subject to advice-boundary controls holding in hypercare."},
+  {id:"a1u2", name:"Wealth RM client-response assistant", div:"WRB — Wealth", pattern:"Copilot (human-fronted)", platform:"Azure OpenAI + CRM", agentic:false, autonomy:"L1",
+   desc:"Drafts client responses and portfolio commentary for relationship managers; the RM edits and sends under their own name.",
+   dims:{autonomy:2,data:5,impact:4,regulatory:5,opacity:3,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R5","R7","R9","R10"],
+   jurisdictions:[
+    {c:"SG",note:"MAS FEAT fairness and accountability; FAA suitability rules stay with the licensed RM."},
+    {c:"HK",note:"SFC suitability obligations — AI drafting must not constitute unlicensed advice."},
+    {c:"AE",note:"DFSA client-classification rules for DIFC-booked relationships."}],
+   controls:["Mandatory human edit-and-send: no draft can reach a client unmodified without RM attestation","Suitability language linter flags recommendation phrasing for compliance pre-clearance","Client data scoped to the RM's own book via entitlement pass-through","Drafts watermarked and retained for conduct surveillance"],
+   mitigations:["Start with commentary and servicing drafts; suitability-adjacent drafting phased in only after 6 months of clean sampling","Model denied access to research ratings to avoid implied recommendations"],
+   gates:[
+    {t:"Intake & registration",d:"Mapped to existing RM productivity cluster; overlap check with SC GPT.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"High inherent on data + regulatory dimensions; residual path via R10 documented.",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Linter precision/recall tested; entitlement pass-through pen-tested.",tag:"Gate 3",done:false},
+    {t:"Deployment nod",d:"Nod contingent on conduct-surveillance integration going live first.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — residual Medium achievable only with binding edit-and-send attestation."},
+  {id:"a1u3", name:"Voice IVR intent & summarisation", div:"WRB — Contact centres", pattern:"Voice bot + workflow", platform:"Contact-centre SaaS (3rd party)", agentic:false, autonomy:"L1",
+   desc:"Speech-to-intent routing and post-call summarisation across retail contact centres; no generative responses to clients.",
+   dims:{autonomy:1,data:4,impact:2,regulatory:3,opacity:4,reversibility:1},
+   inherentT:"Medium", residualT:"Medium", rules:["R8","R9"],
+   jurisdictions:[
+    {c:"IN",note:"DPDP Act consent for voice processing; call recordings localised."},
+    {c:"MY",note:"BNM RMiT outsourcing assessment for the SaaS provider."},
+    {c:"KE",note:"ODPC registration; cross-border transfer assessment for cloud processing."}],
+   controls:["Vendor RAI clause executed with evaluation access and incident SLAs","Voice biometrics explicitly out of scope in the contract","Summaries marked machine-generated and excluded from complaint adjudication evidence without review","In-region transcription for localisation markets"],
+   mitigations:["Third-party opacity (R8) offset by contractual evaluation rights and quarterly vendor model-change notifications"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as vendor-embedded AI; linked to A12 archetype controls.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"R8 escalation applied then offset by contract remediation.",tag:"Gate 2",done:true},
+    {t:"Controls & localisation testing",d:"In-region processing verified per market before go-live wave.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved market-by-market as localisation evidence lands.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium residual, market-by-market rollout tied to localisation evidence."}
+ ]},
+
+{id:"a2", glyph:"EC", name:"Engineering copilots", domains:["fn"],
+ patterns:["Copilot","Agentic coding","Workflow"],
+ platforms:["GitHub Copilot","Claude Code","Azure DevOps"],
+ inherent:"Medium",
+ blurb:"Code assistants and agentic coding tools for the engineering population — completion, generation, repo-level tasks.",
+ detail:"The clean split is suggestion versus action. IDE completion with a human committing every line is the portfolio's canonical Medium-to-Low story. Agentic coding that edits, runs and raises PRs is an agent under R1 — Medium floor — and its tier tracks what its tools can touch.",
+ useCases:[
+  {id:"a2u1", name:"GitHub Copilot enterprise rollout", div:"Functions — Technology", pattern:"IDE copilot", platform:"GitHub Copilot (Azure-hosted)", agentic:false, autonomy:"L1",
+   desc:"Code completion and chat inside the IDE for licensed engineers; every change goes through the standard PR and CI pipeline.",
+   dims:{autonomy:1,data:3,impact:2,regulatory:2,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R10","R11","R12"],
+   jurisdictions:[
+    {c:"UK",note:"IP and open-source licence posture reviewed by Legal."},
+    {c:"IN",note:"GBS engineering hubs — code repositories classified, no client data in prompts."},
+    {c:"SG",note:"TRM guidelines — SDLC controls unchanged by AI assistance."}],
+   controls:["Prompt/response telemetry retained; secrets scanner blocks credential leakage into prompts","Duplication filter enabled to reduce verbatim licensed-code reproduction","Repo allow-list: regulated-model code bases excluded from context","Standard branch protection — nothing merges without human review and CI"],
+   mitigations:["Sensitive repos (pricing, finc models) excluded until DLP maturity review","Quarterly sampling of AI-assisted commits for quality and licence hygiene"],
+   gates:[
+    {t:"Intake & registration",d:"Single Group-level registration covering all engineering entities.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Low-eligibility (R12) confirmed: no decisioning, human commits everything.",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Secrets-scanner efficacy and telemetry pipeline verified.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved; annual re-tier on feature changes (agent mode would re-open).",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low residual. Re-tier trigger registered: enabling agent mode re-opens assessment."},
+  {id:"a2u2", name:"Claude Code agentic repo tasks", div:"Functions — Technology", pattern:"Agentic coding", platform:"Claude Code (CLI)", agentic:true, autonomy:"L2",
+   desc:"Agent plans and executes multi-file changes, runs tests and raises PRs in sandboxed repos; humans approve merges and any command escalation.",
+   dims:{autonomy:3,data:3,impact:3,regulatory:2,opacity:3,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R1","R10","R11"],
+   jurisdictions:[
+    {c:"UK",note:"Change-management controls apply to agent-raised PRs as to human PRs."},
+    {c:"IN",note:"GBS hubs — agent execution confined to in-region dev environments."},
+    {c:"HK",note:"HKMA outsourcing lens on the model API dependency."}],
+   controls:["Sandboxed execution: no production credentials, network egress allow-listed","Tool scope: read/write on feature branches only; main branch untouchable by the agent","Human approval gate on every merge and every permission escalation","Session transcripts and diffs retained — forensic by default","Kill-switch and rollback tested per repo onboarding"],
+   mitigations:["Onboard repos in waves ranked by blast radius; regulated-model repos last and only with 2LoD sign-off","Agent-vs-human PR agreement rate tracked as the drift alarm (target ≥85%)"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as agentic — R1 floor applied at intake.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"L2 autonomy confirmed (proposes, acts in sandbox, human merges).",tag:"Gate 2",done:true},
+    {t:"Controls & red-team",d:"Prompt-injection and egress red-team on the sandbox; rollback drills.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Approved for wave-1 repos; agreement-rate dashboard is a nod condition.",tag:"Gate 4",done:false}],
+   verdict:"Conditional nod — Medium residual (R1 floor). Autonomy creep to L3 would force High."},
+  {id:"a2u3", name:"AI code-review & test-generation bot", div:"Functions — Technology", pattern:"CI workflow", platform:"Azure DevOps pipelines", agentic:false, autonomy:"L1",
+   desc:"Pipeline step that reviews PR diffs, flags defects and generates unit tests as suggestions; advisory only, never blocking or merging.",
+   dims:{autonomy:1,data:2,impact:2,regulatory:2,opacity:3,reversibility:1},
+   inherentT:"Low", residualT:"Low", rules:["R12"],
+   jurisdictions:[
+    {c:"UK",note:"No personal data; internal code only."},
+    {c:"SG",note:"TRM — advisory tooling, SDLC accountability unchanged."}],
+   controls:["Advisory-only: cannot approve, block or merge","Findings labelled AI-generated in the PR timeline","Model pinned per release train; upgrades re-evaluated"],
+   mitigations:["Periodic false-positive review to prevent alert fatigue eroding real review discipline"],
+   gates:[
+    {t:"Intake & registration",d:"Registered under engineering-productivity cluster.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"R12 Low-eligibility met in full.",tag:"Gate 2",done:true},
+    {t:"Controls check",d:"Advisory-only enforcement verified in pipeline config.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low. The reference example of R12 eligibility done properly."}
+ ]},
+
+{id:"a3", glyph:"DI", name:"Document intelligence & IDP", domains:["cib","fn"],
+ patterns:["OCR / IDP","AI workflow","Extraction + rules"],
+ platforms:["Azure Document Intelligence","GCP Document AI","Third-party IDP"],
+ inherent:"Medium",
+ blurb:"OCR and intelligent document processing — trade documents, invoices, KYC packs — extraction feeding downstream process.",
+ detail:"The tier follows what the extraction feeds. Invoice capture with maker–checker is Medium trending Low; document checking inside trade finance compliance or KYC touches regulated processes (R7) and holds Medium-High until human adjudication is proven binding.",
+ useCases:[
+  {id:"a3u1", name:"Trade finance document examination assist", div:"CIB — Transaction Banking", pattern:"IDP + rules engine", platform:"Azure Document Intelligence", agentic:false, autonomy:"L1",
+   desc:"Extracts and cross-checks fields across LC documents, flags discrepancies for the document checker; checker adjudicates every presentation.",
+   dims:{autonomy:2,data:4,impact:4,regulatory:4,opacity:3,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R7","R10"],
+   jurisdictions:[
+    {c:"HK",note:"Major trade hub volumes; HKMA operational-resilience expectations."},
+    {c:"SG",note:"MAS — trade-based money-laundering red flags remain a human call."},
+    {c:"IN",note:"Trade docs contain personal + financial data; DPDP and localisation checks."},
+    {c:"BD",note:"High-volume corridor; local record-keeping requirements."}],
+   controls:["Every discrepancy decision is human-adjudicated; the model cannot pass or refuse documents","Confidence thresholds route low-confidence extractions to full manual examination","TBML red-flag logic stays in the deterministic rules engine, not the model","Extraction accuracy tracked per corridor and document type with drift alarms"],
+   mitigations:["Corridor-by-corridor rollout starting with cleanest document quality","Dual-run against manual examination for 3 months per corridor before reliance"],
+   gates:[
+    {t:"Intake & registration",d:"Linked to trade transformation programme inventory.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R7 applied — regulated process; decisioning explicitly excluded.",tag:"Gate 2",done:true},
+    {t:"Dual-run evidence",d:"Accuracy vs human baseline per corridor; TBML flag integrity tested.",tag:"Gate 3",done:false},
+    {t:"Deployment nod",d:"Nod per corridor as dual-run clears.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — Medium residual per corridor once dual-run evidence lands."},
+  {id:"a3u2", name:"Invoice recognition — accounts payable", div:"Functions — Finance Ops", pattern:"OCR workflow", platform:"Third-party IDP + SAP", agentic:false, autonomy:"L1",
+   desc:"Captures vendor invoices, matches to POs in SAP and posts drafts; maker–checker approves every posting above threshold.",
+   dims:{autonomy:2,data:3,impact:3,regulatory:2,opacity:3,reversibility:3},
+   inherentT:"Medium", residualT:"Low", rules:["R8","R10","R11"],
+   jurisdictions:[
+    {c:"IN",note:"GST e-invoice validation stays in the compliant deterministic path."},
+    {c:"CN",note:"Fapiao handling localised; no invoice images leave jurisdiction."},
+    {c:"AE",note:"VAT record retention rules applied to captured artefacts."}],
+   controls:["Three-way match (invoice–PO–receipt) enforced in SAP before any posting","Auto-post permitted only below de-minimis threshold with 100% next-day sampling","Vendor-master changes always human-approved — payment-redirection fraud guard","Vendor RAI clause with accuracy SLAs and model-change notice"],
+   mitigations:["R8 opacity offset contractually; R6 handled by in-country capture for CN"],
+   gates:[
+    {t:"Intake & registration",d:"Registered against finance shared services.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"Escalation and offsets documented; fraud scenario workshop held.",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Three-way match bypass attempts tested; sampling regime live.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved with threshold reviewed semi-annually.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low residual under maker–checker; auto-post threshold is the watched variable."},
+  {id:"a3u3", name:"KYC document extraction & refresh", div:"CIB / WRB — Client Onboarding", pattern:"IDP + RAG verification", platform:"GCP Document AI", agentic:false, autonomy:"L1",
+   desc:"Extracts entity data from KYC packs and drafts refresh profiles; analysts verify and own every submission to the CDD decision.",
+   dims:{autonomy:2,data:5,impact:4,regulatory:5,opacity:3,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R7","R9","R10"],
+   jurisdictions:[
+    {c:"UK",note:"MLRs — CDD accountability cannot transfer to a model."},
+    {c:"SG",note:"MAS 626 requirements; FEAT documentation for the extraction model."},
+    {c:"HK",note:"AMLO; cross-border profile assembly assessed."},
+    {c:"KR",note:"PIPA — resident registration data processed in-region only."}],
+   controls:["Model output is a draft profile, never a CDD conclusion; analyst attestation required","Special-category and national-ID fields processed in-region with field-level encryption","Full lineage from source document to profile field for audit reconstruction","Sanctions/PEP screening remains entirely in the existing deterministic stack"],
+   mitigations:["Refresh (lower risk) before onboarding; high-risk client segments excluded from scope in phase 1"],
+   gates:[
+    {t:"Intake & registration",d:"Mapped against FCC model inventory to avoid scope collision.",tag:"Gate 1",done:true},
+    {t:"Tiering, DRA & DPIA",d:"R9 triggered; in-region processing architecture mandated.",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Lineage reconstruction drill; extraction accuracy per document type.",tag:"Gate 3",done:false},
+    {t:"Conditional nod",d:"Phase-1 scope only; expansion requires fresh tiering.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — Medium residual for refresh scope; onboarding scope would re-open High."}
+ ]},
+
+{id:"a4", glyph:"FC", name:"Financial crime & fraud AI", domains:["fn"],
+ patterns:["ML scoring","AI workflow","Hybrid rules + ML"],
+ platforms:["On-prem AI Factory","Azure ML","Vendor screening engines"],
+ inherent:"High",
+ blurb:"Transaction monitoring, sanctions screening support and fraud detection — the most regulator-scrutinised models in the estate.",
+ detail:"Everything here lives inside R7. The design pattern that survives review: AI narrows and prioritises, deterministic rules and humans decide. Suppressing alerts or auto-clearing matches without human adjudication is the line the portfolio does not cross.",
+ useCases:[
+  {id:"a4u1", name:"AML alert triage & prioritisation", div:"Functions — FCC", pattern:"ML scoring over rules", platform:"On-prem AI Factory", agentic:false, autonomy:"L1",
+   desc:"Scores transaction-monitoring alerts for investigator prioritisation and narrative pre-population; no alert is closed by the model.",
+   dims:{autonomy:1,data:5,impact:4,regulatory:5,opacity:4,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R7","R9","R10"],
+   jurisdictions:[
+    {c:"UK",note:"FCA/PRA model-risk expectations; SAR decisions remain human."},
+    {c:"US",note:"BSA/FinCEN — prioritisation acceptable, suppression is not; SR 11-7 validation."},
+    {c:"SG",note:"MAS 626; FEAT fairness assessment on typology coverage."},
+    {c:"HK",note:"HKMA AML guideline alignment; explainability pack per model version."}],
+   controls:["Zero alert suppression: every alert reaches a human queue, scoring changes order only","Champion–challenger against random sampling to prove no typology blind spots","Independent model validation (SR 11-7 style) before every material version","Investigator narratives marked AI-drafted; SAR filing decision human-owned"],
+   mitigations:["Backtesting against historical SAR outcomes each quarter","Regulator engagement pack maintained per market before rollout"],
+   gates:[
+    {t:"Intake & registration",d:"Registered in both AI inventory and model-risk inventory.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"High inherent locked by R7; residual path documented.",tag:"Gate 2",done:true},
+    {t:"Validation & backtesting",d:"Independent validation report; typology coverage evidence.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Live in 4 markets; quarterly backtest is a standing condition.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium residual. Any move toward auto-closure re-opens as High immediately."},
+  {id:"a4u2", name:"Sanctions screening — name-match reduction", div:"Functions — FCC", pattern:"NLP entity resolution", platform:"Vendor engine + Azure ML", agentic:false, autonomy:"L1",
+   desc:"Improves fuzzy-match precision to cut false positives in name screening; all potential matches still route to analysts.",
+   dims:{autonomy:1,data:4,impact:5,regulatory:5,opacity:4,reversibility:4},
+   inherentT:"High", residualT:"High", rules:["R7","R8"],
+   jurisdictions:[
+    {c:"US",note:"OFAC strict liability — a missed true match is the catastrophic scenario."},
+    {c:"UK",note:"OFSI regime; tuning changes evidenced and reversible."},
+    {c:"AE",note:"CBUAE targeted financial sanctions requirements."}],
+   controls:["No auto-clearance of any potential match — precision gains reduce queue size only via analyst throughput","Recall floor contractually and technically enforced: tuning cannot lower true-match capture","Every threshold change dual-approved by FCC and 2LoD with rollback","Vendor algorithm changes gated behind re-validation"],
+   mitigations:["Retain full pre-AI screening path as instant fallback","Monthly seeded-list testing (known true matches injected) to prove recall"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as change to critical screening infrastructure.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Residual stays High by design — irreversibility of a miss (R3 analogue).",tag:"Gate 2",done:true},
+    {t:"Seeded testing",d:"Recall floor proven across scripts and transliterations.",tag:"Gate 3",done:false},
+    {t:"Nod decision",d:"Nod only with standing seeded-test regime and instant fallback.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — will remain High residual permanently; approval means controls, not tier relief."},
+  {id:"a4u3", name:"Real-time card fraud detection", div:"WRB / FN — Fraud Ops", pattern:"Real-time ML scoring", platform:"AWS SageMaker (in-region)", agentic:false, autonomy:"L2",
+   desc:"Scores card transactions in-flight; can decline or step-up authenticate within pre-agreed deterministic guardrails.",
+   dims:{autonomy:3,data:4,impact:4,regulatory:4,opacity:4,reversibility:3},
+   inherentT:"High", residualT:"High", rules:["R4","R7","R11"],
+   jurisdictions:[
+    {c:"IN",note:"RBI payment-data localisation — scoring and storage in-country."},
+    {c:"SG",note:"MAS e-payments user-protection guidelines on wrongful declines."},
+    {c:"KE",note:"High mobile-money interaction; local fraud typologies in training data."}],
+   controls:["Decline authority bounded by deterministic guardrails (amount, segment, velocity); model influences within bounds only","Step-up authentication preferred over hard decline wherever rails allow","Wrongful-decline rate tracked as a fairness metric per segment and market","Sub-second fallback to rules-only scoring on model timeout"],
+   mitigations:["Customer-impact review board sees decline analytics monthly","Model retraining gated on fairness regression tests"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with real-time decisioning flag — highest scrutiny path.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R4 locks High; localisation architecture per RBI confirmed.",tag:"Gate 2",done:true},
+    {t:"Fairness & fallback testing",d:"Segment fairness evidence; fallback drill under load.",tag:"Gate 3",done:true},
+    {t:"Nod with conditions",d:"Approved High-tier operation: monthly fairness reporting mandatory.",tag:"Gate 4",done:true}],
+   verdict:"Approved as a High-tier operation — client-impacting decisioning never de-escalates."}
+ ]},
+
+{id:"a5", glyph:"CR", name:"Credit & risk decisioning", domains:["wrb","cib"],
+ patterns:["ML scoring","Copilot drafting","Early-warning analytics"],
+ platforms:["On-prem AI Factory","Azure ML","SAS / internal risk stack"],
+ inherent:"High",
+ blurb:"Models and assistants that touch credit outcomes — retail scoring, wholesale credit drafting, portfolio early warning.",
+ detail:"R4 is absolute here: material influence on a credit outcome is High, full stop. The interesting governance work is separating decisioning (High, model-risk regime) from drafting and surveillance (which can earn Medium with binding human ownership).",
+ useCases:[
+  {id:"a5u1", name:"Retail credit scoring — challenger model", div:"WRB — Credit Risk", pattern:"ML scoring", platform:"On-prem AI Factory", agentic:false, autonomy:"L2",
+   desc:"Gradient-boosted challenger running alongside the incumbent scorecard for unsecured lending decisions in two pilot markets.",
+   dims:{autonomy:3,data:5,impact:5,regulatory:5,opacity:4,reversibility:4},
+   inherentT:"High", residualT:"High", rules:["R4","R7","R9"],
+   jurisdictions:[
+    {c:"SG",note:"MAS FEAT fairness metrics mandatory; Veritas methodology applied."},
+    {c:"IN",note:"RBI digital-lending guidelines; adverse-action reasons in local language."},
+    {c:"UK",note:"Consumer Duty + potential EU AI Act read-across for high-risk credit AI."}],
+   controls:["Reason codes generated for every decision; adverse-action letters human-review sampled","Fairness testing across protected and proxy attributes per market before and after deployment","Incumbent scorecard retained as challenger benchmark and instant fallback","Model-risk independent validation with annual re-approval"],
+   mitigations:["Pilot capped at defined volume; expansion requires fresh fairness evidence per market"],
+   gates:[
+    {t:"Intake & dual registration",d:"AI inventory + Group model inventory; owners named.",tag:"Gate 1",done:true},
+    {t:"Tiering, DRA & FEAT",d:"High locked (R4); Veritas fairness assessment executed.",tag:"Gate 2",done:true},
+    {t:"Validation & fairness evidence",d:"Independent validation; disparate-impact analysis per market.",tag:"Gate 3",done:false},
+    {t:"Nod decision",d:"Nod would authorise pilot volumes only, as a High-tier operation.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — permanent High. Governance question is evidence quality, not tier."},
+  {id:"a5u2", name:"Wholesale credit paper drafting assistant", div:"CIB — Credit", pattern:"RAG copilot", platform:"Azure OpenAI + credit data mart", agentic:false, autonomy:"L1",
+   desc:"Drafts sections of credit applications — financials commentary, industry outlook, covenant summaries — for credit officers who own the paper.",
+   dims:{autonomy:2,data:4,impact:4,regulatory:4,opacity:3,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R7","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Credit decisions remain committee-owned; drafting is assistance."},
+    {c:"HK",note:"Data drawn from booked-entity perimeter only."},
+    {c:"AE",note:"CB UAE large-exposure context handled by deterministic checks."}],
+   controls:["Numbers pipeline is deterministic: financial figures injected from the data mart, never generated","Hallucination guard: every factual claim must carry a source link to the mart or filed documents","Credit officer attestation on submission; committee papers flag AI-drafted sections","No access to final rating models — drafting cannot see or anchor the outcome"],
+   mitigations:["Blind quality comparison of AI-assisted vs manual papers for two quarters"],
+   gates:[
+    {t:"Intake & registration",d:"Scoped to drafting only; rating influence explicitly out.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R7 minimum applied; R4 avoided by architecture (no rating access).",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Source-linking coverage measured; injection tests on the mart boundary.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Approved — attestation compliance audited quarterly.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium residual because architecture keeps it out of the decision path."},
+  {id:"a5u3", name:"Portfolio early-warning signals", div:"CIB — Risk", pattern:"Analytics + NLP signals", platform:"GCP Vertex + news feeds", agentic:false, autonomy:"L1",
+   desc:"Fuses financials, utilisation and external news into early-warning flags for portfolio managers; flags open reviews, never reclassify exposures.",
+   dims:{autonomy:1,data:3,impact:3,regulatory:3,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Medium", rules:["R7"],
+   jurisdictions:[
+    {c:"UK",note:"Watchlist governance unchanged — flags feed existing committees."},
+    {c:"SG",note:"News/NLP sources licence-cleared for commercial use."},
+    {c:"CN",note:"Onshore counterpart data stays onshore; signals computed in-region."}],
+   controls:["A flag can only open a human review; staging/provisioning paths untouched","Signal precision tracked; noisy sources auto-suspended","News-source provenance logged for every flag"],
+   mitigations:["R6 handled with in-region compute for CN counterparties"],
+   gates:[
+    {t:"Intake & registration",d:"Registered under portfolio-surveillance cluster.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Medium — advisory only inside a regulated process.",tag:"Gate 2",done:true},
+    {t:"Signal validation",d:"Backtest against historical deterioration events.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium. Clean pattern: AI watches, committees decide."}
+ ]},
+
+{id:"a6", glyph:"MK", name:"Markets & post-trade intelligence", domains:["cib"],
+ patterns:["RAG assistant","Analytics","Reconciliation agent"],
+ platforms:["Azure OpenAI","AWS Bedrock","Internal markets stack"],
+ inherent:"Medium",
+ blurb:"Research summarisation, client-conversation intelligence and post-trade operations across Financial Markets.",
+ detail:"Markets AI splits on information barriers and market-conduct exposure. Summarisation inside the research perimeter is manageable Medium; anything that could shade toward client-specific trade ideas or touch price-sensitive flows gets conduct-grade scrutiny.",
+ useCases:[
+  {id:"a6u1", name:"Research summarisation for sales", div:"CIB — Financial Markets", pattern:"RAG assistant", platform:"Azure OpenAI", agentic:false, autonomy:"L1",
+   desc:"Summarises published in-house research for salespeople preparing client conversations; retrieval limited to already-published material.",
+   dims:{autonomy:1,data:3,impact:3,regulatory:4,opacity:3,reversibility:2},
+   inherentT:"Medium", residualT:"Medium", rules:["R7"],
+   jurisdictions:[
+    {c:"UK",note:"MAR + research-distribution rules; summaries inherit publication entitlements."},
+    {c:"HK",note:"SFC research-dissemination controls preserved in retrieval layer."},
+    {c:"SG",note:"MAS conduct expectations; no personal recommendations generated."}],
+   controls:["Retrieval corpus = published research only, entitlement-filtered per client tier","Recommendation phrasing beyond the source rating blocked by output filter","Summaries carry source citations back to the underlying note","Information-barrier attestation: no draft or embargoed research in corpus"],
+   mitigations:["Quarterly surveillance sampling of summaries against MAR conduct scenarios"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with Markets conduct-risk co-review.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Medium with R7 minimum — regulated conduct environment.",tag:"Gate 2",done:true},
+    {t:"Barrier testing",d:"Entitlement filtering and embargo exclusion tested.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium; entitlement-filtered retrieval is the load-bearing control."},
+  {id:"a6u2", name:"Client-flow insight assistant", div:"CIB — Markets Sales", pattern:"Analytics copilot", platform:"Internal stack + Bedrock", agentic:false, autonomy:"L1",
+   desc:"Surfaces patterns in a salesperson's own client-flow history to prepare conversations; strictly per-desk data perimeter.",
+   dims:{autonomy:1,data:4,impact:3,regulatory:5,opacity:3,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R7","R10"],
+   jurisdictions:[
+    {c:"UK",note:"MAR — no cross-desk flow visibility; wall-crossing rules enforced in data layer."},
+    {c:"US",note:"CFTC/SEC swaps-conduct context for covered desks."},
+    {c:"HK",note:"SFC front-office supervision expectations."}],
+   controls:["Hard desk-level data perimeter: a salesperson sees only their own coverage flow","No aggregation across restricted-list names; restricted list applied at query time","Output limited to descriptive analytics — no generated trade recommendations","All queries logged into trade-surveillance"],
+   mitigations:["Conduct-risk red-team of prompt space before each desk onboarding"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with compliance surveillance mapping.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"High inherent on regulatory dimension; Medium residual path via perimeter.",tag:"Gate 2",done:true},
+    {t:"Perimeter testing",d:"Cross-desk leakage attempts; restricted-list bypass tests.",tag:"Gate 3",done:false},
+    {t:"Conditional nod",d:"Desk-by-desk approval as perimeter evidence lands.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — Medium residual only inside a proven desk perimeter."},
+  {id:"a6u3", name:"Post-trade reconciliation agent", div:"CIB — Markets Operations", pattern:"Agentic workflow", platform:"Azure AI Foundry", agentic:true, autonomy:"L2",
+   desc:"Agent investigates settlement breaks: gathers statements, matches candidates and drafts resolution proposals; ops staff execute all corrections.",
+   dims:{autonomy:3,data:3,impact:3,regulatory:3,opacity:3,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R1","R10","R11"],
+   jurisdictions:[
+    {c:"UK",note:"CSDR settlement-discipline context — timely, evidenced resolution."},
+    {c:"SG",note:"Ops hub processing; access via entitlement pass-through."},
+    {c:"IN",note:"GBS ops centre — read access in-region, no client data export."}],
+   controls:["Read-only tool set: agent can query systems, never post corrections","Every resolution proposal carries the evidence trail that produced it","Proposal-acceptance rate tracked as the drift alarm (≥85% agreement target)","Kill-switch drills quarterly; sessions fully replayable"],
+   mitigations:["Break types onboarded by complexity; high-value breaks stay manual-first"],
+   gates:[
+    {t:"Intake & registration",d:"Registered agentic — R1 floor at intake.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"L2 confirmed; read-only scope verified in entitlements.",tag:"Gate 2",done:true},
+    {t:"Agreement-rate evidence",d:"Shadow-mode agreement ≥85% for two months.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Live for low/medium-value breaks; write access explicitly refused.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium (R1 floor). Request for write access was declined at Gate 4."}
+ ]},
+
+{id:"a7", glyph:"KP", name:"Enterprise knowledge & productivity", domains:["wrb","cib","fn","ven"],
+ patterns:["RAG assistant","M365 Copilot","Chat platform"],
+ platforms:["SC GPT (AI Factory)","Microsoft 365 Copilot","Azure OpenAI"],
+ inherent:"Medium",
+ blurb:"The horizontal layer — SC GPT, policy assistants and Microsoft Copilot for the general staff population.",
+ detail:"Highest headcount exposure, lowest per-interaction stakes. The governance centre of gravity is data boundaries and entitlement inheritance: a productivity assistant is only as safe as the permission model it inherits.",
+ useCases:[
+  {id:"a7u1", name:"SC GPT — enterprise assistant", div:"Group-wide", pattern:"Chat + RAG platform", platform:"AI Factory (on-prem Qwen + gateway)", agentic:false, autonomy:"L1",
+   desc:"Internal generative assistant for drafting, summarising and Q&A over approved corpora, hosted on the Group's own AI Factory.",
+   dims:{autonomy:1,data:3,impact:2,regulatory:3,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Medium", rules:["R9","R11"],
+   jurisdictions:[
+    {c:"UK",note:"Group hosting; records-management policy applies to chat retention."},
+    {c:"IN",note:"Large user base in GBS hubs; DPDP-aligned logging."},
+    {c:"CN",note:"Onshore users served by in-region deployment — no cross-border prompts."},
+    {c:"HK",note:"HKMA GenAI circular alignment for staff use."}],
+   controls:["Client-identifying data blocked at the gateway by DLP classifiers","Prompts and outputs retained under legal-hold-capable storage","Usage policy acknowledged per user; misuse analytics to conduct teams","Model hosted on-prem — no external training on Group data"],
+   mitigations:["High-risk connectors (client data marts) excluded from RAG scope pending entitlement work"],
+   gates:[
+    {t:"Intake & registration",d:"Platform-level registration; downstream use cases register separately.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Medium; sovereignty solved architecturally with in-region instances.",tag:"Gate 2",done:true},
+    {t:"DLP & retention testing",d:"Gateway classifier efficacy; retention/hold drills.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved as platform; new corpora require incremental review.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium as a platform; each new corpus or connector re-enters at Gate 2."},
+  {id:"a7u2", name:"Policy & procedures assistant (2LoD)", div:"Functions — Risk & Compliance", pattern:"RAG assistant", platform:"SC GPT corpus extension", agentic:false, autonomy:"L1",
+   desc:"Answers staff questions over Group policies, standards and procedures with clause-level citations.",
+   dims:{autonomy:1,data:2,impact:3,regulatory:3,opacity:2,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R11","R12"],
+   jurisdictions:[
+    {c:"UK",note:"Policy corpus is internal; answers cite the governing document version."},
+    {c:"SG",note:"Local addenda surfaced when a market-specific standard overrides Group."}],
+   controls:["Answers must cite clause and version; uncited answers suppressed","Corpus synced from the authoritative policy library only — no local copies","'Not policy advice for client matters' framing on every response","Unanswerable-question log feeds policy-clarity backlog"],
+   mitigations:["Monthly sampling by policy owners for correctness of citations"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as SC GPT corpus extension.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"Low-eligible: internal, non-decisioning, cited.",tag:"Gate 2",done:true},
+    {t:"Citation testing",d:"Citation accuracy ≥ target on golden question set.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low residual; citations turn a chatbot into a lookup tool."},
+  {id:"a7u3", name:"Microsoft 365 Copilot rollout", div:"Group-wide", pattern:"Embedded SaaS copilot", platform:"Microsoft 365", agentic:false, autonomy:"L1",
+   desc:"Copilot across Word, Excel, Outlook and Teams for licensed staff, inheriting existing M365 permissions.",
+   dims:{autonomy:1,data:4,impact:2,regulatory:3,opacity:4,reversibility:1},
+   inherentT:"Medium", residualT:"Medium", rules:["R8","R9"],
+   jurisdictions:[
+    {c:"UK",note:"Records and e-discovery duties extend to Copilot interactions."},
+    {c:"HK",note:"HKMA outsourcing lens on Microsoft processing locations."},
+    {c:"KR",note:"PIPA — tenant-region configuration reviewed for Korean staff data."}],
+   controls:["Oversharing remediation programme completed before licence waves (permission hygiene)","Sensitivity labels enforced; labelled-confidential content excluded from grounding where required","Copilot interactions captured in compliance records (retention + eDiscovery)","Restricted groups (M&A, research) carved out of early waves"],
+   mitigations:["R8 addressed through Microsoft contractual commitments + tenant-level config evidence rather than model transparency"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as vendor-embedded platform AI.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"R8 escalation offset by contract + configuration evidence.",tag:"Gate 2",done:true},
+    {t:"Permission-hygiene evidence",d:"Oversharing scan results below threshold per wave.",tag:"Gate 3",done:false},
+    {t:"Wave-based nod",d:"Licence waves released as hygiene evidence lands.",tag:"Gate 4",done:false}],
+   verdict:"In rollout — Medium; permission hygiene is the rate limiter, not the model."}
+ ]},
+
+{id:"a8", glyph:"AP", name:"Agentic process automation", domains:["fn"],
+ patterns:["Multi-agent app","Agentic workflow","RPA + AI"],
+ platforms:["ServiceNow","SAP","Azure AI Foundry"],
+ inherent:"High",
+ blurb:"Agents that execute business processes — ITSM, invoice-to-pay, onboarding orchestration — across ServiceNow and SAP.",
+ detail:"This is where R1–R3 earn their keep. Every use case is an agent (Medium floor), autonomy is designed to stay at L2, and tool scope decides the tier: read-and-draft agents can hold Medium; anything touching payments or production config hits the R3 High floor.",
+ useCases:[
+  {id:"a8u1", name:"ServiceNow ITSM resolution agent", div:"Functions — Technology Ops", pattern:"Agentic workflow", platform:"ServiceNow Now Assist + Foundry", agentic:true, autonomy:"L2",
+   desc:"Agent triages incidents, gathers diagnostics, proposes fixes and drafts resolution notes; engineers approve any change action.",
+   dims:{autonomy:3,data:2,impact:3,regulatory:2,opacity:3,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R1","R10","R11"],
+   jurisdictions:[
+    {c:"UK",note:"Change management (production) obligations unchanged."},
+    {c:"IN",note:"Ops hub execution; diagnostics access read-only in-region."},
+    {c:"SG",note:"MAS TRM — incident-handling accountability stays human."}],
+   controls:["Diagnostic tools read-only; remediation executes only via approved change tickets","CAB approval unchanged for production changes — the agent drafts, humans raise","Session replay for every incident touched; agent actions in the audit trail","Severity-1 incidents excluded from agent scope entirely"],
+   mitigations:["Scope grows by incident category with agreement-rate evidence per category"],
+   gates:[
+    {t:"Intake & registration",d:"Agentic registration; tool inventory attached (58-control mapping).",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R1 floor; L2 autonomy design verified.",tag:"Gate 2",done:true},
+    {t:"Controls & replay testing",d:"Read-only enforcement tested; replay fidelity verified.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Live for P3/P4 incidents; P2 expansion under review.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium (R1 floor); Sev-1 exclusion is non-negotiable."},
+  {id:"a8u2", name:"SAP invoice-to-pay multi-agent", div:"Functions — Finance Ops", pattern:"Multi-agent app", platform:"SAP + Azure AI Foundry", agentic:true, autonomy:"L2",
+   desc:"Specialist agents handle capture, matching, exception investigation and posting drafts across the I2P cycle; payment release remains exclusively human.",
+   dims:{autonomy:3,data:3,impact:4,regulatory:3,opacity:3,reversibility:5},
+   inherentT:"High", residualT:"High", rules:["R1","R3","R10"],
+   jurisdictions:[
+    {c:"IN",note:"GST-compliant posting path deterministic; agents cannot alter tax logic."},
+    {c:"CN",note:"Fapiao and cross-border payment rules — in-region processing."},
+    {c:"AE",note:"Payment-release controls per local banking arrangements."}],
+   controls:["R3 hard boundary: no agent holds payment-release or vendor-master-write entitlements","Segregation of duties enforced across agents as it would be across humans","Exception-investigation agent read-only on bank statements and vendor comms","Dual human approval on any posting above threshold; anomaly agent alerts 2LoD directly"],
+   mitigations:["Payment-fraud red-team annually; agent entitlements recertified quarterly like human access"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as multi-agent estate — each agent enumerated with tool scope.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R3 High floor due to payment adjacency; SoD design reviewed.",tag:"Gate 2",done:true},
+    {t:"SoD & entitlement testing",d:"Cross-agent privilege-escalation attempts; recertification dry run.",tag:"Gate 3",done:false},
+    {t:"Nod decision",d:"Would operate as High-tier: enhanced monitoring, no de-escalation path.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — High residual by design; payment adjacency admits no tier relief."},
+  {id:"a8u3", name:"HR onboarding orchestration agent", div:"Functions — HR / Tech", pattern:"Agentic workflow", platform:"ServiceNow HRSD", agentic:true, autonomy:"L2",
+   desc:"Coordinates new-joiner setup — access requests, equipment, mandatory training — by raising and tracking tickets across systems.",
+   dims:{autonomy:3,data:4,impact:2,regulatory:2,opacity:2,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R1","R9","R11"],
+   jurisdictions:[
+    {c:"UK",note:"Employee personal data; UK GDPR basis documented."},
+    {c:"IN",note:"Large joiner volumes; DPDP notice embedded in onboarding flow."},
+    {c:"KR",note:"PIPA-sensitive fields excluded from agent visibility."}],
+   controls:["Agent raises requests through existing approval chains — it cannot approve access","Entitlement templates only; no free-form access requests","PII visibility limited to workflow-necessary fields","Every orchestration run reconstructable from the ticket graph"],
+   mitigations:["Privileged-access requests carved out to human-only path"],
+   gates:[
+    {t:"Intake & registration",d:"Agentic registration; joiner-data DPIA linked.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R1 + R9; Medium residual path via approval-chain preservation.",tag:"Gate 2",done:true},
+    {t:"Controls testing",d:"Attempted privileged-request injection blocked; field-level access verified.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved for standard joiner personas.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium (R1 floor); privileged access stays human-only."}
+ ]},
+
+{id:"a9", glyph:"HR", name:"HR & people AI", domains:["fn"],
+ patterns:["Screening assist","Matching","HR chatbot"],
+ platforms:["HR SaaS (Workday-class)","Azure OpenAI","ServiceNow HRSD"],
+ inherent:"High",
+ blurb:"AI touching the employee lifecycle — hiring screens, internal mobility, HR service.",
+ detail:"Employment decisions are the retail credit of Functions: fairness law bites directly (and the EU AI Act classifies employment AI as high-risk). Assistive ranking with human decision-making can earn Medium; automated rejection cannot.",
+ useCases:[
+  {id:"a9u1", name:"CV screening assistance", div:"Functions — HR Talent", pattern:"Ranking assist", platform:"HR SaaS + Azure ML", agentic:false, autonomy:"L1",
+   desc:"Ranks applications against role criteria for recruiter review; no application is auto-rejected by the model.",
+   dims:{autonomy:2,data:4,impact:4,regulatory:4,opacity:4,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R8","R9","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Equality Act adverse-impact testing; EU AI Act high-risk read-across."},
+    {c:"SG",note:"TAFEP fair-employment guidelines; PDPA on applicant data."},
+    {c:"IN",note:"High applicant volumes in GBS hiring; DPDP notices in ATS flow."}],
+   controls:["No auto-rejection: every application reaches a recruiter decision","Adverse-impact analysis per hiring cycle across gender, age and proxy features","Ranking rationale visible to recruiters; overrides logged and analysed","Vendor model changes gated behind fairness re-testing (RAI clause)"],
+   mitigations:["Blind-review calibration: periodic recruiter review without AI ranking to detect anchor bias"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with employment-law co-review.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"High inherent; Medium path requires standing fairness evidence.",tag:"Gate 2",done:true},
+    {t:"Fairness testing",d:"Adverse-impact baseline per market before reliance.",tag:"Gate 3",done:false},
+    {t:"Conditional nod",d:"Nod per market as fairness baselines land.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — Medium achievable; auto-rejection would be refused outright."},
+  {id:"a9u2", name:"Internal mobility & skills matching", div:"Functions — HR", pattern:"Matching engine", platform:"HR SaaS talent module", agentic:false, autonomy:"L1",
+   desc:"Suggests internal roles and learning paths to employees based on declared skills; opt-in and employee-visible.",
+   dims:{autonomy:1,data:3,impact:3,regulatory:3,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R10","R12"],
+   jurisdictions:[
+    {c:"UK",note:"Transparency: employees see and correct their skill profile."},
+    {c:"HK",note:"PDPO — declared-data-only design avoids inferred-attribute issues."}],
+   controls:["Declared skills only — no inference from communications or activity data","Employee opt-in with visible profile and correction rights","Suggestions advisory; hiring managers see applications, not scores"],
+   mitigations:["Periodic check that suggestion patterns don't channel by demographic"],
+   gates:[
+    {t:"Intake & registration",d:"Registered; DPIA light-touch given declared-data design.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"Low-eligible with opt-in, advisory, declared-data design.",tag:"Gate 2",done:true},
+    {t:"Design verification",d:"No-inference boundary verified with vendor.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low; the declared-data-only design decision did the heavy lifting."},
+  {id:"a9u3", name:"HR service chatbot", div:"Functions — HR Service", pattern:"RAG chatbot", platform:"ServiceNow HRSD", agentic:false, autonomy:"L1",
+   desc:"Answers policy and payroll-process questions for employees, raising HR tickets where resolution needs a human.",
+   dims:{autonomy:1,data:3,impact:2,regulatory:2,opacity:2,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R11","R12"],
+   jurisdictions:[
+    {c:"IN",note:"Payroll-adjacent queries answered from policy, not employee records, in v1."},
+    {c:"MY",note:"Local labour-policy addenda in corpus."}],
+   controls:["v1 corpus = policy documents only; no access to individual employee records","Sensitive topics (grievance, disciplinary, health) hard-routed to humans","Citations to the governing HR policy version on every answer"],
+   mitigations:["Employee-record integration deferred to a separate, re-tiered phase 2"],
+   gates:[
+    {t:"Intake & registration",d:"Registered; phase-2 scope pre-declared for future re-tier.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"Low with policy-only corpus.",tag:"Gate 2",done:true},
+    {t:"Routing tests",d:"Sensitive-topic routing precision verified.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved for v1 scope.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low for policy-only scope; record access re-opens tiering."}
+ ]},
+
+{id:"a10", glyph:"MP", name:"Marketing & personalisation", domains:["wrb","ven"],
+ patterns:["Propensity ML","GenAI content","Next-best-action"],
+ platforms:["GCP Vertex","Adobe/Martech SaaS","AWS (brands)"],
+ inherent:"Medium",
+ blurb:"Offer targeting, content generation and retention analytics across retail and the digital brands.",
+ detail:"Conduct risk in disguise: personalisation that nudges clients toward credit products meets Consumer-Duty-style fair-outcome tests. Content generation is manageable when every asset passes existing marketing-compliance approval — the AI changes the drafting, not the approval.",
+ useCases:[
+  {id:"a10u1", name:"Next-best-offer engine", div:"WRB — Digital", pattern:"Propensity + NBA", platform:"GCP Vertex", agentic:false, autonomy:"L2",
+   desc:"Selects which pre-approved offer a client sees in app; offer eligibility itself computed by deterministic product rules.",
+   dims:{autonomy:2,data:4,impact:3,regulatory:4,opacity:4,reversibility:2},
+   inherentT:"High", residualT:"Medium", rules:["R4","R9","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Consumer Duty — vulnerable-customer suppression rules mandatory."},
+    {c:"SG",note:"MAS fair-dealing outcomes; PDPA marketing consent honoured in feature store."},
+    {c:"TW",note:"Local marketing-consent regime mapped into suppression logic."}],
+   controls:["Eligibility deterministic; AI orders eligible offers only — cannot create eligibility","Vulnerable-customer flags suppress credit offers regardless of propensity","Frequency caps and cooling-off enforced outside the model","Uplift monitored per segment for fairness drift"],
+   mitigations:["Credit-product offers held to stricter suppression until Consumer-Duty evidence matures"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with conduct-risk co-review.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"R4 argued down to influence-not-eligibility; High inherent retained, Medium residual path set.",tag:"Gate 2",done:true},
+    {t:"Suppression testing",d:"Vulnerability suppression proven across scenario library.",tag:"Gate 3",done:true},
+    {t:"Conditional nod",d:"Approved; monthly fair-outcome dashboard to 2LoD.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium; the deterministic-eligibility boundary is what kept R4 at bay."},
+  {id:"a10u2", name:"GenAI marketing content studio", div:"WRB / Brands", pattern:"GenAI content", platform:"Martech SaaS + Azure OpenAI", agentic:false, autonomy:"L1",
+   desc:"Drafts campaign copy and variants; every asset flows through the existing marketing-compliance approval workflow before release.",
+   dims:{autonomy:1,data:2,impact:3,regulatory:3,opacity:3,reversibility:2},
+   inherentT:"Medium", residualT:"Low", rules:["R5","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Financial-promotions regime — approval workflow is the control."},
+    {c:"HK",note:"SFC/HKMA promotion rules for investment-adjacent content."},
+    {c:"KE",note:"Local-language claims reviewed by market compliance."}],
+   controls:["No AI asset publishes without financial-promotions sign-off — unchanged workflow","Claims-checker flags rate, fee and performance claims for source verification","Brand and prohibited-terms linting pre-approval","Asset provenance metadata retained (prompt, model, editor)"],
+   mitigations:["R5 satisfied because human review is structural: the promotions workflow predates the AI"],
+   gates:[
+    {t:"Intake & registration",d:"Registered across WRB + brand marketing entities.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"Medium inherent; Low residual via structural review.",tag:"Gate 2",done:true},
+    {t:"Workflow verification",d:"No-bypass test of the promotions gate.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low residual; the pre-existing approval gate absorbs the generative risk."},
+  {id:"a10u3", name:"Churn & retention propensity", div:"SC Ventures — Brands", pattern:"Propensity ML", platform:"AWS (brand-native)", agentic:false, autonomy:"L1",
+   desc:"Predicts attrition risk to drive retention journeys in Mox and Trust; interventions limited to service and pre-approved-offer nudges.",
+   dims:{autonomy:1,data:4,impact:2,regulatory:3,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R9","R11"],
+   jurisdictions:[
+    {c:"HK",note:"PDPO purpose limitation on behavioural features (Mox)."},
+    {c:"SG",note:"PDPA + MAS fair dealing (Trust)."}],
+   controls:["Feature store excludes protected attributes and their close proxies","Interventions limited to service outreach and existing eligible offers","Model card and drift monitoring in brand MLOps stack"],
+   mitigations:["Group 2LoD sampling rights over brand model documentation formalised"],
+   gates:[
+    {t:"Intake & registration",d:"Registered via brand governance bridge into Group inventory.",tag:"Gate 1",done:true},
+    {t:"Tiering",d:"Medium inherent, Low residual with intervention limits.",tag:"Gate 2",done:true},
+    {t:"Feature review",d:"Proxy-feature audit completed.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low; intervention design, not model design, set the tier."}
+ ]},
+
+{id:"a11", glyph:"RC", name:"Regulatory & compliance intelligence", domains:["fn"],
+ patterns:["NLP horizon scan","Obligation mapping","Anomaly detection"],
+ platforms:["Azure OpenAI","GCP Vertex","RegTech SaaS"],
+ inherent:"Medium",
+ blurb:"AI supporting the compliance function itself — horizon scanning, obligation-to-control mapping, reporting-quality checks.",
+ detail:"Second-line tooling with a self-referential twist: 2LoD governs AI while using it. The discipline is treating our own tools with the same rigour — an obligation-mapping model that silently misses a rule change is a High-severity failure wearing a Medium badge.",
+ useCases:[
+  {id:"a11u1", name:"Regulatory horizon scanning", div:"Functions — Compliance", pattern:"NLP monitoring", platform:"RegTech SaaS + Azure", agentic:false, autonomy:"L1",
+   desc:"Monitors regulator publications across the footprint, classifies relevance and routes summaries to policy owners.",
+   dims:{autonomy:1,data:1,impact:3,regulatory:3,opacity:3,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R8","R11"],
+   jurisdictions:[
+    {c:"UK",note:"FCA/PRA/OFSI feeds; source coverage attested quarterly."},
+    {c:"SG",note:"MAS circulars including FEAT/Veritas updates."},
+    {c:"IN",note:"RBI + SEBI + DPDP rule-making tracked."},
+    {c:"AE",note:"CBUAE + DFSA + FSRA multi-regulator coverage."}],
+   controls:["Coverage attestation: monitored-source list reviewed against footprint quarterly","Missed-publication drills — seeded documents must surface","Classification is routing, not conclusion; policy owners own the read","Vendor RAI clause with coverage SLAs"],
+   mitigations:["Human weekly sweep retained for top-12 markets as a safety net"],
+   gates:[
+    {t:"Intake & registration",d:"Registered; source list attached as living annex.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"R8 offset contractually; Medium→Low with human sweep.",tag:"Gate 2",done:true},
+    {t:"Seeded-miss testing",d:"Seeded publications surfaced within SLA.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low; the human sweep is the honest admission that recall isn't provable."},
+  {id:"a11u2", name:"Obligation-to-control mapping assistant", div:"Functions — Compliance / 2LoD", pattern:"RAG + graph mapping", platform:"Azure OpenAI + GRC platform", agentic:false, autonomy:"L1",
+   desc:"Drafts mappings from regulatory obligations to the control library for compliance-officer confirmation; feeds the 12-market jurisdiction matrix.",
+   dims:{autonomy:2,data:2,impact:4,regulatory:4,opacity:3,reversibility:2},
+   inherentT:"Medium", residualT:"Medium", rules:["R7","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Mapping errors propagate into attestations — treated as reg-reporting adjacent."},
+    {c:"HK",note:"Cross-border obligation conflicts flagged for human resolution."},
+    {c:"CN",note:"Onshore obligations mapped by onshore compliance with AI drafts only."}],
+   controls:["Every mapping human-confirmed before entering the GRC system of record","Confidence scores exposed; low-confidence mappings force full manual analysis","Mapping provenance retained — which obligation text produced which link","Quarterly reconciliation against manually maintained golden mappings"],
+   mitigations:["New-regulation mappings always dual-reviewed for first 12 months"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as 2LoD internal tooling — same rigour applied.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"Medium held (not Low) due to attestation adjacency.",tag:"Gate 2",done:true},
+    {t:"Golden-set testing",d:"Mapping precision/recall vs golden set per market.",tag:"Gate 3",done:false},
+    {t:"Conditional nod",d:"Nod pending golden-set thresholds in remaining markets.",tag:"Gate 4",done:false}],
+   verdict:"In assessment — deliberately held at Medium; our own tools get no discount."},
+  {id:"a11u3", name:"Regulatory reporting anomaly checks", div:"Functions — Finance / Reg Reporting", pattern:"Anomaly detection", platform:"GCP Vertex + reporting stack", agentic:false, autonomy:"L1",
+   desc:"Flags anomalies in regulatory returns before submission — outliers, breaks in series, cross-report inconsistencies.",
+   dims:{autonomy:1,data:3,impact:4,regulatory:5,opacity:3,reversibility:3},
+   inherentT:"High", residualT:"Medium", rules:["R7","R10"],
+   jurisdictions:[
+    {c:"UK",note:"PRA returns — anomaly flags are pre-submission QA, not sign-off."},
+    {c:"HK",note:"HKMA banking returns in scope."},
+    {c:"SG",note:"MAS 610/1003 returns coverage."}],
+   controls:["Flags advisory: submission sign-off chain unchanged","No-flag ≠ clean: attestation language prevents negative-assurance creep","Anomaly thresholds governed with change control","Detection performance reviewed against restatement history"],
+   mitigations:["Explicit training for preparers that the tool finds candidates, not correctness"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as reg-reporting adjacent — R7 minimum from intake.",tag:"Gate 1",done:true},
+    {t:"Tiering & DRA",d:"High inherent (reg dimension); Medium residual via advisory design.",tag:"Gate 2",done:true},
+    {t:"Threshold governance testing",d:"Change-control on thresholds verified.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved with negative-assurance guard language.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Medium; the subtle risk was attestation creep, and language fixed it."}
+ ]},
+
+{id:"a12", glyph:"3P", name:"Third-party embedded AI", domains:["wrb","cib","fn","ven"],
+ patterns:["Embedded SaaS AI","Vendor copilots","Platform AI features"],
+ platforms:["SAP Joule","ServiceNow Now Assist","Design & productivity SaaS"],
+ inherent:"Medium",
+ blurb:"AI that arrives inside software we already run — vendor copilots and platform features we didn't build and can't fully see.",
+ detail:"The fastest-growing intake category and the hardest to inventory: AI switched on by a vendor release note. R8 exists for this archetype. The governance answer is contractual (RAI clauses, evaluation access, change notice) plus configuration evidence — and a refusal posture when vendors won't contract for it.",
+ useCases:[
+  {id:"a12u1", name:"SAP Joule in finance modules", div:"Functions — Finance", pattern:"Embedded copilot", platform:"SAP S/4 + Joule", agentic:false, autonomy:"L1",
+   desc:"SAP's embedded assistant for query, navigation and drafting inside finance modules used by Group finance teams.",
+   dims:{autonomy:2,data:3,impact:3,regulatory:3,opacity:4,reversibility:2},
+   inherentT:"Medium", residualT:"Medium", rules:["R8","R10"],
+   jurisdictions:[
+    {c:"UK",note:"Processing-location and sub-processor review under outsourcing policy."},
+    {c:"IN",note:"Finance hub usage; data-residency configuration evidenced."},
+    {c:"CN",note:"Onshore instance — Joule availability and routing reviewed separately."}],
+   controls:["Feature-level enablement: Joule capabilities switched on individually after review","SAP contractual commitments on data use (no training on Group data) evidenced","Transaction-posting suggestions require the same approvals as manual entry","Vendor release notes triaged monthly for silent AI-feature additions"],
+   mitigations:["R8 partially persistent — evaluation access is limited, so tier holds at Medium rather than dropping"],
+   gates:[
+    {t:"Intake & registration",d:"Registered per-feature, not per-product — granularity is the control.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"R8 escalation; contract remediation partially offsets.",tag:"Gate 2",done:true},
+    {t:"Configuration evidence",d:"Data-residency and no-training configuration verified.",tag:"Gate 3",done:true},
+    {t:"Feature-wave nod",d:"Approved feature-by-feature; new features re-enter at Gate 2.",tag:"Gate 4",done:true}],
+   verdict:"Approved feature-by-feature — Medium; the release-note triage is the real control."},
+  {id:"a12u2", name:"ServiceNow Now Assist (embedded)", div:"Functions — Technology / HR", pattern:"Embedded copilot", platform:"ServiceNow platform", agentic:false, autonomy:"L1",
+   desc:"Native summarisation, drafting and search across ITSM and HRSD workflows on the ServiceNow instance.",
+   dims:{autonomy:2,data:3,impact:2,regulatory:2,opacity:4,reversibility:1},
+   inherentT:"Medium", residualT:"Low", rules:["R8","R11"],
+   jurisdictions:[
+    {c:"UK",note:"Instance-region and LLM-routing configuration reviewed."},
+    {c:"SG",note:"MAS outsourcing/TRM assessment refreshed for AI features."}],
+   controls:["Skills enabled individually; agentic 'AI Agents' features held pending separate agentic review (would be R1)","HR-sensitive record types excluded from summarisation scope","Now Assist interactions logged in instance audit","Contractual no-training commitment and model-change notice in place"],
+   mitigations:["Clear boundary registered: embedded assist ≈ this record; Now Assist agents = new intake under A8/R1"],
+   gates:[
+    {t:"Intake & registration",d:"Registered as embedded-assist scope only.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"Medium→Low with logging + exclusions; agentic features excluded.",tag:"Gate 2",done:true},
+    {t:"Scope testing",d:"Excluded record types verified untouchable.",tag:"Gate 3",done:true},
+    {t:"Deployment nod",d:"Approved for assist scope.",tag:"Gate 4",done:true}],
+   verdict:"Approved — Low for assist scope; the agentic features are a different use case on purpose."},
+  {id:"a12u3", name:"Design & productivity SaaS with generative AI", div:"Group-wide — Technology", pattern:"Embedded GenAI SaaS", platform:"Design/prototyping SaaS", agentic:false, autonomy:"L1",
+   desc:"Generative design and prototyping features inside creative SaaS used by product and design teams — the vendor declined the Group's Responsible AI contract clause.",
+   dims:{autonomy:1,data:2,impact:2,regulatory:2,opacity:5,reversibility:1},
+   inherentT:"Medium", residualT:"Medium", rules:["R8"],
+   jurisdictions:[
+    {c:"UK",note:"IP posture on generated assets reviewed; no client data in scope by policy."},
+    {c:"SG",note:"Usage policy: internal prototyping only, no production client-facing assets."}],
+   controls:["R8 escalation stands: no RAI clause means no tier relief and a constrained usage policy","Hard usage boundary: internal prototypes only; no client data, no production assets","DLP monitoring on uploads to the SaaS domain","Annual re-review with exit criteria if vendor posture doesn't improve"],
+   mitigations:["Compensating governance documented since contractual control was refused — the reference case for vendor-refusal handling"],
+   gates:[
+    {t:"Intake & registration",d:"Registered with vendor-refusal flag — elevated review path.",tag:"Gate 1",done:true},
+    {t:"Tiering & vendor DRA",d:"R8 applied without offset; usage-boundary policy drafted.",tag:"Gate 2",done:true},
+    {t:"Boundary controls",d:"DLP rules live; usage policy acknowledged by user population.",tag:"Gate 3",done:true},
+    {t:"Constrained nod",d:"Approved for bounded internal use; expansion blocked until clause lands.",tag:"Gate 4",done:true}],
+   verdict:"Constrained approval — Medium held by R8; the boundary substitutes for the clause the vendor refused."}
+ ]}
+];
+
+/* ---------- derived helpers ---------- */
+const TIER_ORDER = {Low:0, Medium:1, High:2};
+const TIER_CLASS = {Low:"low", Medium:"med", High:"high"};
+const TIER_POS = {Low:12, Medium:50, High:90};  /* % along the spectrum lane */
+
+function allUseCases(){ return ARCHETYPES.flatMap(a=>a.useCases.map(u=>({...u, arch:a}))); }
+function tierCounts(){
+  const c={High:0,Medium:0,Low:0};
+  allUseCases().forEach(u=>c[u.residualT]++);
+  return c;
+}
+function ruleById(id){ return RULES.find(r=>r.id===id); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+</script>
+<script>
+/* ============================================================
+   APP — router, renderers, simulator
+   ============================================================ */
+const app = document.getElementById("app");
+const crumbsEl = document.getElementById("crumbs");
+let state = {view:"home", p1:null, p2:null, tab:"assess"};
+
+document.getElementById("enterBtn").addEventListener("click",()=>{
+  document.getElementById("cover").classList.add("hidden");
+});
+document.querySelectorAll("#mainTabs button").forEach(b=>{
+  b.addEventListener("click",()=>go(b.dataset.v));
+});
+
+function go(view,p1,p2){
+  state={view,p1:p1||null,p2:p2||null,tab:"assess"};
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function chip(t){ return `<span class="chip ${TIER_CLASS[t]}"><span class="dot"></span>${t}</span>`; }
+function setTabs(){
+  document.querySelectorAll("#mainTabs button").forEach(b=>{
+    const map={home:"home",domains:"domains",domain:"domains",arch:"home",uc:"home",rules:"rules",sim:"sim"};
+    b.classList.toggle("active", map[state.view]===b.dataset.v);
+  });
+}
+function crumbs(items){
+  crumbsEl.innerHTML = items.map((it,i)=>{
+    const last = i===items.length-1;
+    return last ? `<span>${esc(it.t)}</span>`
+      : `<a onclick="${it.go}">${esc(it.t)}</a><span class="sep">/</span>`;
+  }).join("");
+}
+
+/* ---------------- HOME ---------------- */
+function renderHome(){
+  crumbs([{t:"Portfolio"}]);
+  const c = tierCounts();
+  const total = c.High+c.Medium+c.Low;
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">Portfolio view · Second line of defence</div>
+      <h1>Where every AI use case lands, and why</h1>
+      <p class="lede">Twelve archetypes group the Group's AI and agentic AI use cases by what they do, not what they're built on. Click any card to drill from archetype to use case to the last level of assessment detail — dimensions, jurisdictions, controls, mitigation and the road to a deployment nod.</p>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat" onclick="go('domains')"><b>${DOMAINS.length}</b><span>Business domains</span></div>
+      <div class="stat"><b>${ARCHETYPES.length}</b><span>Archetypes</span></div>
+      <div class="stat"><b>${total}</b><span>Use cases mapped</span></div>
+      <div class="stat tier-high"><b>${c.High}</b><span>High residual</span></div>
+      <div class="stat tier-med"><b>${c.Medium}</b><span>Medium residual</span></div>
+      <div class="stat tier-low"><b>${c.Low}</b><span>Low residual</span></div>
+    </div>
+
+    <div class="section-title">Archetypes — click to explore</div>
+    <div class="card-grid">
+      ${ARCHETYPES.map(a=>{
+        const doms = a.domains.map(d=>DOMAINS.find(x=>x.id===d).code).join(" · ");
+        return `
+        <div class="card" onclick="go('arch','${a.id}')">
+          <div class="glyph">${a.glyph}</div>
+          <h3>${esc(a.name)}</h3>
+          <p>${esc(a.blurb)}</p>
+          <div class="tag-row">${chip(a.inherent)}<span class="chip neutral">${doms}</span></div>
+          <div class="foot">
+            <span class="count">${a.useCases.length} use cases</span>
+            <span class="go">Open →</span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="section-title">How the atlas decides</div>
+    <div class="split">
+      <div class="panel">
+        <h4>Operating principle</h4>
+        <p style="font-size:14.5px">Agents draft, humans decide. A deterministic rules engine owns the tier — the twelve static rules apply identically to a chatbot in a brand app and a multi-agent estate on SAP. Floors are absolute: no agent is ever Low, L3+ autonomy is always High, and irreversible tool access admits no de-escalation.</p>
+        <p style="font-size:14.5px;margin-top:10px">Inherent tier reflects the use case as designed; residual reflects it as controlled. Credits (human-in-the-loop, containment) can move residual down one band — never through a floor.</p>
+      </div>
+      <div class="panel">
+        <h4>Try it yourself</h4>
+        <p style="font-size:14.5px">The simulator applies the same static rules to a hypothetical use case you configure. Watch which rules fire and where it lands.</p>
+        <button class="backlink" onclick="go('sim')" style="margin-top:14px">Open the tiering simulator →</button>
+        <button class="backlink" onclick="go('rules')" style="display:block">Read the twelve rules →</button>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <span>AI Risk &amp; Governance · Archetype Atlas · illustrative portfolio for discussion</span>
+      <span>All tiers reflect static rules R1–R12</span>
+    </div>
+  </div>`;
+}
+
+/* ---------------- DOMAINS ---------------- */
+function renderDomains(){
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:"Domains"}]);
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">Business domains</div>
+      <h1>Four lenses on one portfolio</h1>
+      <p class="lede">Every archetype cuts across the organisation, but risk concentrates differently by domain. Open a domain to see the archetypes and use cases that live there.</p>
+    </div>
+    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
+      ${DOMAINS.map(d=>{
+        const archs = ARCHETYPES.filter(a=>a.domains.includes(d.id));
+        const ucs = archs.reduce((n,a)=>n+a.useCases.length,0);
+        return `
+        <div class="card domain-card" onclick="go('domain','${d.id}')">
+          <div class="glyph">${d.code}</div>
+          <h3>${esc(d.name)}</h3>
+          <p>${esc(d.desc)}</p>
+          <div class="foot">
+            <span class="count">${archs.length} archetypes · ${ucs} use cases</span>
+            <span class="go">Open →</span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+}
+
+function renderDomain(){
+  const d = DOMAINS.find(x=>x.id===state.p1);
+  const archs = ARCHETYPES.filter(a=>a.domains.includes(d.id));
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:"Domains",go:"go('domains')"},{t:d.name}]);
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">Domain · ${d.code}</div>
+      <h1>${esc(d.name)}</h1>
+      <p class="lede">${esc(d.desc)}</p>
+      <p class="lede" style="font-size:14px;color:var(--sc-blue-dark)"><b>Risk texture:</b> ${esc(d.colorNote)}</p>
+    </div>
+    <div class="section-title">Archetypes active in ${d.code}</div>
+    <div class="card-grid">
+      ${archs.map(a=>`
+        <div class="card" onclick="go('arch','${a.id}')">
+          <div class="glyph">${a.glyph}</div>
+          <h3>${esc(a.name)}</h3>
+          <p>${esc(a.blurb)}</p>
+          <div class="tag-row">${chip(a.inherent)}</div>
+          <div class="foot"><span class="count">${a.useCases.length} use cases</span><span class="go">Open →</span></div>
+        </div>`).join("")}
+    </div>
+    <button class="backlink" onclick="go('domains')">← All domains</button>
+  </div>`;
+}
+
+/* ---------------- ARCHETYPE ---------------- */
+function renderArch(){
+  const a = ARCHETYPES.find(x=>x.id===state.p1);
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:a.name}]);
+  const doms = a.domains.map(d=>DOMAINS.find(x=>x.id===d).name).join(" · ");
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">Archetype</div>
+      <h1>${esc(a.name)}</h1>
+      <p class="lede">${esc(a.detail)}</p>
+    </div>
+
+    <div class="split" style="margin-top:26px">
+      <div>
+        <div class="section-title" style="margin-top:0">Use cases — click for full assessment</div>
+        <div class="uc-list">
+          ${a.useCases.map(u=>`
+            <div class="uc-card" onclick="go('uc','${a.id}','${u.id}')">
+              <div class="tag-row">
+                <span class="chip pattern">${esc(u.pattern)}</span>
+                ${u.agentic?'<span class="chip pattern" style="background:#FDEFE6;color:#B4560F">Agentic · '+u.autonomy+'</span>':''}
+              </div>
+              <h4>${esc(u.name)}</h4>
+              <p>${esc(u.desc)}</p>
+              <div class="tiers">
+                ${chip(u.inherentT)} <span class="arrow-flow">→</span> ${chip(u.residualT)}
+              </div>
+            </div>`).join("")}
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Archetype profile</h4>
+        <div class="kv"><b>Domains</b><span>${esc(doms)}</span></div>
+        <div class="kv"><b>Typical inherent tier</b><span>${chip(a.inherent)}</span></div>
+        <div class="kv"><b>Solution patterns</b><span>${a.patterns.map(esc).join(" · ")}</span></div>
+        <div class="kv"><b>Common platforms</b><span>${a.platforms.map(esc).join(" · ")}</span></div>
+        <div class="kv"><b>Use cases mapped</b><span>${a.useCases.length}</span></div>
+      </div>
+    </div>
+    <button class="backlink" onclick="go('home')">← All archetypes</button>
+  </div>`;
+}
+
+/* ---------------- USE CASE ---------------- */
+function renderUC(){
+  const a = ARCHETYPES.find(x=>x.id===state.p1);
+  const u = a.useCases.find(x=>x.id===state.p2);
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:a.name,go:`go('arch','${a.id}')`},{t:u.name}]);
+
+  const tabs = [
+    {id:"assess", label:"Risk assessment"},
+    {id:"jx", label:"Jurisdictions"},
+    {id:"ctl", label:"Controls"},
+    {id:"road", label:"Mitigation & road ahead"}
+  ];
+
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">${esc(a.name)} · ${esc(u.div)}</div>
+      <h1>${esc(u.name)}</h1>
+      <p class="lede">${esc(u.desc)}</p>
+      <div class="tag-row" style="margin-top:14px">
+        <span class="chip pattern">${esc(u.pattern)}</span>
+        <span class="chip pattern">${esc(u.platform)}</span>
+        ${u.agentic?'<span class="chip pattern" style="background:#FDEFE6;color:#B4560F">Agentic · autonomy '+u.autonomy+'</span>':'<span class="chip neutral">Non-agentic · autonomy '+u.autonomy+'</span>'}
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h4>Tier journey — inherent to residual</h4>
+      <div class="spectrum">
+        <div class="lane">
+          <div class="marker inh" id="mInh" style="left:6%"></div>
+          <div class="marker res" id="mRes" style="left:6%"></div>
+        </div>
+        <div class="legend"><span>Low</span><span>Medium</span><span>High</span></div>
+        <div class="spectrum-note">
+          <span><i style="background:var(--sc-blue-dark)"></i>Inherent: <b>${u.inherentT}</b></span>
+          <span><i style="background:var(--sc-green-dark)"></i>Residual: <b>${u.residualT}</b></span>
+          <span style="margin-left:auto;color:var(--mist)">Rules applied: ${u.rules.join(" · ")}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      ${tabs.map(t=>`<button class="${state.tab===t.id?'active':''}" onclick="setUCTab('${t.id}')">${t.label}</button>`).join("")}
+    </div>
+    <div id="tabBody"></div>
+
+    <div class="panel" style="margin-top:30px;border-left:5px solid var(--sc-blue)">
+      <h4>2LoD verdict</h4>
+      <p style="font-size:15px"><b>${esc(u.verdict)}</b></p>
+    </div>
+    <button class="backlink" onclick="go('arch','${a.id}')">← ${esc(a.name)}</button>
+  </div>`;
+
+  renderUCTab(u);
+  requestAnimationFrame(()=>{ setTimeout(()=>{
+    document.getElementById("mInh").style.left = TIER_POS[u.inherentT]+"%";
+    document.getElementById("mRes").style.left = TIER_POS[u.residualT]+"%";
+  },80); });
+}
+
+function setUCTab(t){
+  state.tab=t;
+  const a = ARCHETYPES.find(x=>x.id===state.p1);
+  const u = a.useCases.find(x=>x.id===state.p2);
+  document.querySelectorAll(".tabbar button").forEach((b,i)=>{
+    b.classList.toggle("active", ["assess","jx","ctl","road"][i]===t);
+  });
+  renderUCTab(u);
+}
+
+function renderUCTab(u){
+  const body = document.getElementById("tabBody");
+  if(state.tab==="assess"){
+    body.innerHTML = `
+    <div class="split">
+      <div class="panel">
+        <h4>Six-dimension scoring</h4>
+        <div class="dims">
+          ${Object.entries(u.dims).map(([k,v])=>`
+            <div class="dim">
+              <label>${DIM_LABELS[k]}</label>
+              <div class="track"><div class="fill ${v>=4?'hot':''}" data-w="${v*20}"></div></div>
+              <b>${v}/5</b>
+            </div>`).join("")}
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Static rules that fired</h4>
+        <ul class="fired" style="margin-top:0">
+          ${u.rules.map(id=>{const r=ruleById(id);return `<li><b>${r.id}</b><span><b>${esc(r.name)}.</b> ${esc(r.text)}</span></li>`;}).join("")}
+        </ul>
+      </div>
+    </div>`;
+    requestAnimationFrame(()=>{ setTimeout(()=>{
+      body.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%");
+    },60); });
+  }
+  if(state.tab==="jx"){
+    body.innerHTML = `
+    <div class="jx-grid">
+      ${u.jurisdictions.map(j=>`
+        <div class="jx">
+          <b><span class="flagbox">${j.c}</span>${j.c}</b>
+          <p>${esc(j.note)}</p>
+        </div>`).join("")}
+    </div>
+    <p style="font-size:12.5px;color:var(--mist);margin-top:16px">Jurisdiction notes are the market-specific overlays from the 12-market matrix that materially shaped this assessment — not the full obligation register.</p>`;
+  }
+  if(state.tab==="ctl"){
+    body.innerHTML = `
+    <ul class="check-list">
+      ${u.controls.map(c=>`<li><span class="tick">✓</span><span>${esc(c)}</span></li>`).join("")}
+    </ul>`;
+  }
+  if(state.tab==="road"){
+    body.innerHTML = `
+    <div class="split">
+      <div class="panel">
+        <h4>Governance gates</h4>
+        <div class="gates">
+          ${u.gates.map(g=>`
+            <div class="gate ${g.done?'done':''}">
+              <span class="gtag">${g.tag} ${g.done?'· cleared':'· open'}</span>
+              <b>${esc(g.t)}</b>
+              <span>${esc(g.d)}</span>
+            </div>`).join("")}
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Risk mitigation plan</h4>
+        <ul class="check-list">
+          ${u.mitigations.map(m=>`<li class="warn"><span class="tick">!</span><span>${esc(m)}</span></li>`).join("")}
+        </ul>
+      </div>
+    </div>`;
+  }
+}
+
+/* ---------------- RULES ---------------- */
+function renderRules(){
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:"Tiering rules"}]);
+  const groups=[["floor","Floors — absolute, no de-escalation"],["escalate","Escalators — push the tier up"],["credit","Credits & eligibility — earn the way down"]];
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">The deterministic rules engine</div>
+      <h1>Twelve static rules own the tier</h1>
+      <p class="lede">Models don't tier models here. Every assessment — human-run or agent-assisted — resolves through the same twelve rules, in the same order: floors first, escalators second, credits last and never through a floor.</p>
+    </div>
+    ${groups.map(([k,label])=>`
+      <div class="section-title">${label}</div>
+      <div class="rule-grid">
+        ${RULES.filter(r=>r.kind===k).map(r=>`
+          <div class="rule ${k}">
+            <span class="rid">${r.id}</span>
+            <b>${esc(r.name)}</b>
+            <p>${esc(r.text)}</p>
+          </div>`).join("")}
+      </div>`).join("")}
+    <div class="panel" style="margin-top:36px">
+      <h4>Evaluation order</h4>
+      <p style="font-size:14.5px">1. Score the six dimensions and derive a base tier. &nbsp;2. Apply floors R1–R5 — the tier can only rise. &nbsp;3. Apply escalators R6–R9 for context. &nbsp;4. Apply credits R10–R12 to reach residual — one band maximum, floors immovable. The simulator runs exactly this sequence.</p>
+      <button class="backlink" onclick="go('sim')">Run the simulator →</button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- SIMULATOR ---------------- */
+const SIM = {
+  pattern:"RAG assistant", autonomy:1, data:2, exposure:0, decision:0, tools:0,
+  sovereignty:false, regulated:false, opaque:false, hitl:true, contain:true
+};
+const SIM_OPTS = {
+  pattern:["Chatbot","RAG assistant","AI workflow","Copilot","Multi-agent app","Agentic app","Embedded SaaS AI"],
+  data:["Public","Internal","Confidential / PII","Client financial / special category"],
+  exposure:["Internal only","Staff-assisted client contact","Direct to client"],
+  decision:["No decisioning","Advisory to a human","Material influence on outcome","Automated decision"],
+  tools:["Read-only","Write — reversible","Write — irreversible (payments, ledger, client comms)"]
+};
+const AUTONOMY_DESC=["L0 — suggests only","L1 — drafts, human executes","L2 — acts in sandbox, human approves effect","L3 — acts first, reports after","L4 — fully autonomous"];
+
+function isAgenticPattern(p){ return ["Multi-agent app","Agentic app"].includes(p); }
+
+function computeSim(){
+  const fired=[];
+  const agentic = isAgenticPattern(SIM.pattern) || SIM.autonomy>=2;
+  /* base score from proxy dimensions (1-5 scale each) */
+  const dims = {
+    autonomy: SIM.autonomy+1,
+    data: SIM.data+2 > 5 ? 5 : SIM.data+2,
+    impact: SIM.decision+2 > 5 ? 5 : SIM.decision+2,
+    regulatory: (SIM.regulated?4:2) + (SIM.exposure===2?1:0),
+    opacity: SIM.opaque?4:3,
+    reversibility: SIM.tools===2?5:(SIM.tools===1?3:1)
+  };
+  if(dims.regulatory>5)dims.regulatory=5;
+  const avg = Object.values(dims).reduce((a,b)=>a+b,0)/6;
+  let base = avg>=3.4?"High":(avg>=2.2?"Medium":"Low");
+  let tier = base;
+  const up = t=> t==="Low"?"Medium":"High";
+
+  let floor = "Low";
+  const setFloor = f=>{ if(TIER_ORDER[f]>TIER_ORDER[floor]) floor=f; };
+
+  if(agentic){ fired.push(["R1","Agentic pattern or L2+ autonomy — Medium floor applies."]); setFloor("Medium"); }
+  if(SIM.autonomy>=3){ fired.push(["R2","Autonomy L3+ — automatically High, no de-escalation."]); setFloor("High"); }
+  if(SIM.tools===2){ fired.push(["R3","Irreversible tool access — High floor."]); setFloor("High"); }
+  if(SIM.decision>=2 && SIM.exposure>=1){ fired.push(["R4","Material influence on client outcomes — High."]); setFloor("High"); }
+  if(SIM.exposure===2){ fired.push(["R5","Generative output direct to client — Medium minimum."]); setFloor("Medium"); }
+  if(SIM.regulated){ fired.push(["R7","Regulated process — Medium minimum"+(SIM.decision>=2?"; decisioning inside it — High.":".")]); setFloor(SIM.decision>=2?"High":"Medium"); }
+  if(SIM.data>=2){ fired.push(["R9","PII at scale / sensitive data — Medium minimum, DPIA mandatory."]); setFloor("Medium"); }
+
+  if(SIM.sovereignty){ fired.push(["R6","Localisation-market data crossing borders — escalate one band."]); tier=up(tier); }
+  if(SIM.opaque){ fired.push(["R8","Third-party opacity without RAI clause — escalate one band."]); tier=up(tier); }
+
+  if(TIER_ORDER[floor]>TIER_ORDER[tier]) tier=floor;
+  const inherent = tier;
+
+  /* credits */
+  let residual = inherent;
+  const down = t=> t==="High"?"Medium":"Low";
+  let credits=0;
+  if(SIM.hitl){ credits++; fired.push(["R10","Human-in-the-loop credit available — one band down, floors permitting."]); }
+  if(SIM.contain){ credits++; fired.push(["R11","Containment credit available — one band down, floors permitting."]); }
+  for(let i=0;i<Math.min(credits,1);i++){ /* max one band total */
+    const candidate = down(residual);
+    if(TIER_ORDER[candidate]>=TIER_ORDER[floor]) residual=candidate;
+  }
+  const lowOK = !agentic && SIM.exposure===0 && SIM.decision===0 && SIM.data<2 && !SIM.regulated && SIM.autonomy<=1;
+  if(residual==="Low" && !lowOK){ residual="Medium"; }
+  if(lowOK && residual!=="Low" && floor==="Low" && !SIM.sovereignty && !SIM.opaque){
+    fired.push(["R12","Low-eligibility gate met — internal, non-decisioning, low-sensitivity, L0–L1."]);
+  }
+  if(TIER_ORDER[residual]<TIER_ORDER[floor]) residual=floor;
+
+  return {inherent, residual, floor, fired, dims, agentic};
+}
+
+function renderSim(){
+  crumbs([{t:"Portfolio",go:"go('home')"},{t:"Simulator"}]);
+  app.innerHTML = `
+  <div class="view">
+    <div class="page-head">
+      <div class="kicker">Interactive · the same rules, live</div>
+      <h1>Tier a hypothetical use case</h1>
+      <p class="lede">Configure a use case the way it would arrive at intake. The engine applies R1–R12 in order and shows exactly which rules fired. Try to build an agent that lands Low — you can't, and that's the point.</p>
+    </div>
+    <div class="sim-wrap" style="margin-top:26px">
+      <div class="sim-controls">
+        <div class="ctl">
+          <label>Solution pattern</label>
+          <div class="seg" id="segPattern">
+            ${SIM_OPTS.pattern.map(p=>`<button data-v="${p}" class="${SIM.pattern===p?'on':''}">${p}</button>`).join("")}
+          </div>
+        </div>
+        <div class="ctl">
+          <label>Autonomy level <output id="autOut">${AUTONOMY_DESC[SIM.autonomy]}</output></label>
+          <input type="range" min="0" max="4" step="1" value="${SIM.autonomy}" id="autRange">
+        </div>
+        <div class="ctl">
+          <label>Data classification</label>
+          <div class="seg" id="segData">${SIM_OPTS.data.map((p,i)=>`<button data-v="${i}" class="${SIM.data===i?'on':''}">${p}</button>`).join("")}</div>
+        </div>
+        <div class="ctl">
+          <label>Client exposure</label>
+          <div class="seg" id="segExp">${SIM_OPTS.exposure.map((p,i)=>`<button data-v="${i}" class="${SIM.exposure===i?'on':''}">${p}</button>`).join("")}</div>
+        </div>
+        <div class="ctl">
+          <label>Decisioning role</label>
+          <div class="seg" id="segDec">${SIM_OPTS.decision.map((p,i)=>`<button data-v="${i}" class="${SIM.decision===i?'on':''}">${p}</button>`).join("")}</div>
+        </div>
+        <div class="ctl">
+          <label>Tool access</label>
+          <div class="seg" id="segTools">${SIM_OPTS.tools.map((p,i)=>`<button data-v="${i}" class="${SIM.tools===i?'on':''}">${p}</button>`).join("")}</div>
+        </div>
+        <div class="ctl">
+          <label>Context & controls</label>
+          <div class="seg" id="segFlags">
+            <button data-f="sovereignty" class="${SIM.sovereignty?'on':''}">Localisation-market data crosses border</button>
+            <button data-f="regulated" class="${SIM.regulated?'on':''}">Inside regulated process (AML / credit / reg reporting)</button>
+            <button data-f="opaque" class="${SIM.opaque?'on':''}">Third-party AI, no RAI clause</button>
+            <button data-f="hitl" class="${SIM.hitl?'on':''}">Human-in-the-loop sign-off</button>
+            <button data-f="contain" class="${SIM.contain?'on':''}">Containment: read-only · sandbox · kill-switch</button>
+          </div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>`;
+
+  document.getElementById("segPattern").addEventListener("click",e=>{
+    if(e.target.dataset.v!==undefined){SIM.pattern=e.target.dataset.v;refreshSeg("segPattern",SIM.pattern);updateVerdict();}
+  });
+  const autR=document.getElementById("autRange");
+  autR.addEventListener("input",()=>{SIM.autonomy=+autR.value;document.getElementById("autOut").textContent=AUTONOMY_DESC[SIM.autonomy];updateVerdict();});
+  [["segData","data"],["segExp","exposure"],["segDec","decision"],["segTools","tools"]].forEach(([id,key])=>{
+    document.getElementById(id).addEventListener("click",e=>{
+      if(e.target.dataset.v!==undefined){SIM[key]=+e.target.dataset.v;refreshSeg(id,String(SIM[key]));updateVerdict();}
+    });
+  });
+  document.getElementById("segFlags").addEventListener("click",e=>{
+    const f=e.target.dataset.f;
+    if(f){SIM[f]=!SIM[f];e.target.classList.toggle("on",SIM[f]);updateVerdict();}
+  });
+  updateVerdict();
+}
+function refreshSeg(id,val){
+  document.querySelectorAll(`#${id} button`).forEach(b=>b.classList.toggle("on",b.dataset.v===val));
+}
+function updateVerdict(){
+  const r = computeSim();
+  const color = r.residual==="High"?"var(--high)":(r.residual==="Medium"?"var(--med)":"var(--low)");
+  const v = document.getElementById("verdict");
+  v.innerHTML = `
+    <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--mist)">Engine verdict</h4>
+    <div class="big-tier" style="color:${color}">
+      <span class="pulse" style="background:${color}"></span>${r.residual}
+    </div>
+    <div style="font-size:13px;color:var(--slate)">Residual tier · inherent ${r.inherent} · floor ${r.floor}${r.agentic?" · treated as agentic":""}</div>
+    <div class="spectrum" style="margin-top:20px">
+      <div class="lane">
+        <div class="marker inh" style="left:${TIER_POS[r.inherent]}%"></div>
+        <div class="marker res" style="left:${TIER_POS[r.residual]}%"></div>
+      </div>
+      <div class="legend"><span>Low</span><span>Medium</span><span>High</span></div>
+    </div>
+    <div class="score-readout">
+      <div><b>${Object.values(r.dims).reduce((a,b)=>a+b,0)}</b><span>Dimension points / 30</span></div>
+      <div><b>${r.fired.length}</b><span>Rules fired</span></div>
+    </div>
+    <ul class="fired">
+      ${r.fired.map(([id,txt],i)=>`<li style="animation-delay:${i*60}ms"><b>${id}</b><span>${txt}</span></li>`).join("")}
+      ${r.fired.length===0?'<li><b>—</b><span>No floors or escalators fired. Base scoring alone sets the tier.</span></li>':''}
+    </ul>`;
+}
+
+/* ---------------- router ---------------- */
+function render(){
+  setTabs();
+  if(state.view==="home") renderHome();
+  else if(state.view==="domains") renderDomains();
+  else if(state.view==="domain") renderDomain();
+  else if(state.view==="arch") renderArch();
+  else if(state.view==="uc") renderUC();
+  else if(state.view==="rules") renderRules();
+  else if(state.view==="sim") renderSim();
+}
+render();
+/* cover counters reflect live data */
+document.getElementById("cvArch").textContent = ARCHETYPES.length;
+document.getElementById("cvUC").textContent = allUseCases().length;
+document.getElementById("cvRules").textContent = RULES.length;
+document.getElementById("cvDomains").textContent = DOMAINS.length;
+</script>
+</body>
+</html>
